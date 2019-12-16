@@ -117,7 +117,7 @@ public class ResultPartitionMetrics {
 	}
 
 	// ------------------------------------------------------------------------
-	//  Gauges to access the stats
+	//  Gauges to access the delay
 	// ------------------------------------------------------------------------
 
 	private Gauge<Long> getTotalQueueLenGauge() {

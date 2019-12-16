@@ -3639,7 +3639,7 @@ public class CheckpointCoordinatorTest extends TestLogger {
 	}
 
 	/**
-	 * Tests that the pending checkpoint stats callbacks are created.
+	 * Tests that the pending checkpoint delay callbacks are created.
 	 */
 	@Test
 	public void testCheckpointStatsTrackerPendingCheckpointCallback() {

@@ -44,7 +44,7 @@ public class JobVertexBackPressureInfo implements ResponseBody {
 	public static final String FIELD_NAME_END_TIMESTAMP = "end-timestamp";
 	public static final String FIELD_NAME_SUBTASKS = "subtasks";
 
-	/** Immutable singleton instance denoting that the back pressure stats are not available. */
+	/** Immutable singleton instance denoting that the back pressure delay are not available. */
 	private static final JobVertexBackPressureInfo DEPRECATED_JOB_VERTEX_BACK_PRESSURE_INFO = new JobVertexBackPressureInfo(
 		VertexBackPressureStatus.DEPRECATED,
 		null,

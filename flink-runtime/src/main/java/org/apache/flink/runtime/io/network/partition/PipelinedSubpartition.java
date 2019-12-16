@@ -110,7 +110,7 @@ class PipelinedSubpartition extends ResultSubpartition {
 				return false;
 			}
 
-			// Add the bufferConsumer and update the stats
+			// Add the bufferConsumer and update the delay
 			buffers.add(bufferConsumer);
 			updateStatistics(bufferConsumer);
 			increaseBuffersInBacklog(bufferConsumer);

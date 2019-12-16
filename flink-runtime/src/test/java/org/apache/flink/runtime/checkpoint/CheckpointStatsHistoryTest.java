@@ -95,7 +95,7 @@ public class CheckpointStatsHistoryTest {
 
 		snapshot = history.createSnapshot();
 
-		// Check in progress stats.
+		// Check in progress delay.
 		Iterator<AbstractCheckpointStats> it = snapshot.getCheckpoints().iterator();
 		for (int i = 3; i > 0; i--) {
 			assertTrue(it.hasNext());

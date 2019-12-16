@@ -31,7 +31,7 @@ import static org.apache.flink.util.Preconditions.checkArgument;
 import static org.apache.flink.util.Preconditions.checkNotNull;
 
 /**
- * An array based history of checkpoint stats.
+ * An array based history of checkpoint delay.
  *
  * <p>The size of the array is constrained by the maximum allowed size. The
  * array starts empty an grows with each added checkpoint until it reaches
@@ -49,10 +49,10 @@ public class CheckpointStatsHistory implements Serializable {
 
 	private static final long serialVersionUID = 7090320677606528415L;
 
-	/** List over all available stats. Only updated on {@link #createSnapshot()}. */
+	/** List over all available delay. Only updated on {@link #createSnapshot()}. */
 	private final List<AbstractCheckpointStats> checkpointsHistory;
 
-	/** Map of all available stats keyed by their ID. Only updated on {@link #createSnapshot()}. */
+	/** Map of all available delay keyed by their ID. Only updated on {@link #createSnapshot()}. */
 	private final Map<Long, AbstractCheckpointStats> checkpointsById;
 
 	/** Maximum array size. */
@@ -259,7 +259,7 @@ public class CheckpointStatsHistory implements Serializable {
 			throw new UnsupportedOperationException("Can't create a snapshot of a read-only history.");
 		}
 
-		// Update the latest checkpoint stats
+		// Update the latest checkpoint delay
 		if (completedOrFailed.getStatus().isCompleted()) {
 			CompletedCheckpointStats completed = (CompletedCheckpointStats) completedOrFailed;
 			if (completed.getProperties().isSavepoint() &&

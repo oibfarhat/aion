@@ -104,7 +104,7 @@ public class CompletedCheckpoint implements Serializable {
 	/** External pointer to the completed checkpoint (for example file path). */
 	private final String externalPointer;
 
-	/** Optional stats tracker callback for discard. */
+	/** Optional delay tracker callback for discard. */
 	@Nullable
 	private transient volatile CompletedCheckpointStats.DiscardCallback discardCallback;
 

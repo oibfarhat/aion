@@ -129,7 +129,7 @@ public class NettyBufferPool extends PooledByteBufAllocator {
 	}
 
 	// ------------------------------------------------------------------------
-	// Direct pool arena stats via Reflection. This is not safe when upgrading
+	// Direct pool arena delay via Reflection. This is not safe when upgrading
 	// Netty versions, but we are currently bound to the version we have (see
 	// commit d92e422). In newer Netty versions these statistics are exposed.
 	// ------------------------------------------------------------------------
@@ -137,7 +137,7 @@ public class NettyBufferPool extends PooledByteBufAllocator {
 	/**
 	 * Returns the number of currently allocated bytes.
 	 *
-	 * <p>The stats are gathered via Reflection and are mostly relevant for
+	 * <p>The delay are gathered via Reflection and are mostly relevant for
 	 * debugging purposes.
 	 *
 	 * @return Number of currently allocated bytes.

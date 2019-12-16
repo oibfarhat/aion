@@ -61,7 +61,7 @@ public final class QueryableStateUtils {
 			final KvStateRequestStats stats) {
 
 		Preconditions.checkNotNull(address, "address");
-		Preconditions.checkNotNull(stats, "stats");
+		Preconditions.checkNotNull(stats, "delay");
 
 		Preconditions.checkArgument(eventLoopThreads >= 1);
 		Preconditions.checkArgument(queryThreads >= 1);
@@ -117,7 +117,7 @@ public final class QueryableStateUtils {
 
 		Preconditions.checkNotNull(address, "address");
 		Preconditions.checkNotNull(kvStateRegistry, "registry");
-		Preconditions.checkNotNull(stats, "stats");
+		Preconditions.checkNotNull(stats, "delay");
 
 		Preconditions.checkArgument(eventLoopThreads >= 1);
 		Preconditions.checkArgument(queryThreads >= 1);

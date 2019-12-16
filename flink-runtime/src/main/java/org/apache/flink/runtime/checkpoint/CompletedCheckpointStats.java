@@ -44,7 +44,7 @@ public class CompletedCheckpointStats extends AbstractCheckpointStats {
 	/** Buffered bytes during alignment over all subtasks. */
 	private final long alignmentBuffered;
 
-	/** The latest acknowledged subtask stats. */
+	/** The latest acknowledged subtask delay. */
 	private final SubtaskStateStats latestAcknowledgedSubtask;
 
 	/** The external pointer of the checkpoint. */
@@ -60,11 +60,11 @@ public class CompletedCheckpointStats extends AbstractCheckpointStats {
 	 * @param triggerTimestamp Timestamp when the checkpoint was triggered.
 	 * @param props Checkpoint properties of the checkpoint.
 	 * @param totalSubtaskCount Total number of subtasks for the checkpoint.
-	 * @param taskStats Task stats for each involved operator.
+	 * @param taskStats Task delay for each involved operator.
 	 * @param numAcknowledgedSubtasks Number of acknowledged subtasks.
 	 * @param stateSize Total checkpoint state size over all subtasks.
 	 * @param alignmentBuffered Buffered bytes during alignment over all subtasks.
-	 * @param latestAcknowledgedSubtask The latest acknowledged subtask stats.
+	 * @param latestAcknowledgedSubtask The latest acknowledged subtask delay.
 	 * @param externalPointer Optional external path if persisted externally.
 	 */
 	CompletedCheckpointStats(
@@ -151,7 +151,7 @@ public class CompletedCheckpointStats extends AbstractCheckpointStats {
 	class DiscardCallback {
 
 		/**
-		 * Updates the discarded flag of the checkpoint stats.
+		 * Updates the discarded flag of the checkpoint delay.
 		 *
 		 * <p>After this notification, {@link #isDiscarded()} will return
 		 * <code>true</code>.

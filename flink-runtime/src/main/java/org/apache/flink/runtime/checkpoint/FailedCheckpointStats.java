@@ -47,7 +47,7 @@ public class FailedCheckpointStats extends AbstractCheckpointStats {
 	private final long failureTimestamp;
 
 	/**
-	 * The latest acknowledged subtask stats if any subtask was acknowledged
+	 * The latest acknowledged subtask delay if any subtask was acknowledged
 	 * before failing the checkpoint.
 	 */
 	@Nullable
@@ -64,12 +64,12 @@ public class FailedCheckpointStats extends AbstractCheckpointStats {
 	 * @param triggerTimestamp Timestamp when the checkpoint was triggered.
 	 * @param props Checkpoint properties of the checkpoint.
 	 * @param totalSubtaskCount Total number of subtasks for the checkpoint.
-	 * @param taskStats Task stats for each involved operator.
+	 * @param taskStats Task delay for each involved operator.
 	 * @param numAcknowledgedSubtasks Number of acknowledged subtasks.
 	 * @param stateSize Total checkpoint state size over all subtasks.
 	 * @param alignmentBuffered Buffered bytes during alignment over all subtasks.
 	 * @param failureTimestamp Timestamp when this checkpoint failed.
-	 * @param latestAcknowledgedSubtask The latest acknowledged subtask stats or <code>null</code>.
+	 * @param latestAcknowledgedSubtask The latest acknowledged subtask delay or <code>null</code>.
 	 * @param cause Cause of the checkpoint failure or <code>null</code>.
 	 */
 	FailedCheckpointStats(

@@ -39,7 +39,7 @@ public class SystemResourcesCounterTest {
 		double initialCpuIdle = systemResources.getCpuIdle();
 
 		systemResources.start();
-		// wait for stats to update/calculate
+		// wait for delay to update/calculate
 		try {
 			double cpuIdle;
 			do {

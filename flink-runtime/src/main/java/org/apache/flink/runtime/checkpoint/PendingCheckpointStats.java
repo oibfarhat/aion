@@ -66,7 +66,7 @@ public class PendingCheckpointStats extends AbstractCheckpointStats {
 	 * @param triggerTimestamp Timestamp when the checkpoint was triggered.
 	 * @param props Checkpoint properties of the checkpoint.
 	 * @param totalSubtaskCount Total number of subtasks for the checkpoint.
-	 * @param taskStats Task stats for each involved operator.
+	 * @param taskStats Task delay for each involved operator.
 	 * @param trackerCallback Callback for the {@link CheckpointStatsTracker}.
 	 */
 	PendingCheckpointStats(

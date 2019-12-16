@@ -165,7 +165,7 @@ public class MemoryLogger extends Thread {
 		long nonHeapCommitted = nonHeap.getCommitted() >> 20;
 		long nonHeapMax = nonHeap.getMax() >> 20;
 
-		return String.format("Memory usage stats: [HEAP: %d/%d/%d MB, " +
+		return String.format("Memory usage delay: [HEAP: %d/%d/%d MB, " +
 				"NON HEAP: %d/%d/%d MB (used/committed/max)]",
 				heapUsed, heapCommitted, heapMax, nonHeapUsed, nonHeapCommitted, nonHeapMax);
 	}
@@ -173,7 +173,7 @@ public class MemoryLogger extends Thread {
 	/**
 	 * Returns a String with the <strong>direct</strong> memory footprint.
 	 *
-	 * <p>These stats are not part of the other memory beans.
+	 * <p>These delay are not part of the other memory beans.
 	 *
 	 * @param bufferPoolMxBean The direct buffer pool bean or <code>null</code> if none available.
 	 *
@@ -181,10 +181,10 @@ public class MemoryLogger extends Thread {
 	 */
 	public static String getDirectMemoryStatsAsString(BufferPoolMXBean bufferPoolMxBean) {
 		if (bufferPoolMxBean == null) {
-			return "Direct memory stats: unavailable";
+			return "Direct memory delay: unavailable";
 		}
 		else {
-			return String.format("Direct memory stats: Count: %d, Total Capacity: %d, Used Memory: %d",
+			return String.format("Direct memory delay: Count: %d, Total Capacity: %d, Used Memory: %d",
 					bufferPoolMxBean.getCount(),
 					bufferPoolMxBean.getTotalCapacity(),
 					bufferPoolMxBean.getMemoryUsed());
@@ -198,7 +198,7 @@ public class MemoryLogger extends Thread {
 	 * @return A string denoting the names and sizes of the memory pools.
 	 */
 	public static String getMemoryPoolStatsAsString(List<MemoryPoolMXBean> poolBeans) {
-		StringBuilder bld = new StringBuilder("Off-heap pool stats: ");
+		StringBuilder bld = new StringBuilder("Off-heap pool delay: ");
 		int count = 0;
 		
 		for (MemoryPoolMXBean bean : poolBeans) {
@@ -229,7 +229,7 @@ public class MemoryLogger extends Thread {
 	 * @return A string denoting the number of times and total elapsed time in garbage collection.
 	 */
 	public static String getGarbageCollectorStatsAsString(List<GarbageCollectorMXBean> gcMXBeans) {
-		StringBuilder bld = new StringBuilder("Garbage collector stats: ");
+		StringBuilder bld = new StringBuilder("Garbage collector delay: ");
 		
 		for (GarbageCollectorMXBean bean : gcMXBeans) {
 			bld.append('[').append(bean.getName()).append(", GC TIME (ms): ").append(bean.getCollectionTime());

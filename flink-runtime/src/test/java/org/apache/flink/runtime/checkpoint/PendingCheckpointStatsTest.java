@@ -36,7 +36,7 @@ import static org.mockito.Mockito.verify;
 public class PendingCheckpointStatsTest {
 
 	/**
-	 * Tests reporting of subtask stats.
+	 * Tests reporting of subtask delay.
 	 */
 	@Test
 	public void testReportSubtaskStats() throws Exception {

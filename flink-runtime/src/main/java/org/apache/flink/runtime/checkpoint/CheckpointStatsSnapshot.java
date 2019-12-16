@@ -25,7 +25,7 @@ import java.io.Serializable;
 import static org.apache.flink.util.Preconditions.checkNotNull;
 
 /**
- * A snapshot of the checkpoint stats.
+ * A snapshot of the checkpoint delay.
  */
 public class CheckpointStatsSnapshot implements Serializable {
 
@@ -34,7 +34,7 @@ public class CheckpointStatsSnapshot implements Serializable {
 	/** Snapshot of the checkpoint counts. */
 	private final CheckpointStatsCounts counts;
 
-	/** Snapshot of the completed checkpoints summary stats. */
+	/** Snapshot of the completed checkpoints summary delay. */
 	private final CompletedCheckpointStatsSummary summary;
 
 	/** Snapshot of the checkpoint history. */
@@ -45,10 +45,10 @@ public class CheckpointStatsSnapshot implements Serializable {
 	private final RestoredCheckpointStats latestRestoredCheckpoint;
 
 	/**
-	 * Creates a stats snapshot.
+	 * Creates a delay snapshot.
 	 *
 	 * @param counts Snapshot of the checkpoint counts.
-	 * @param summary Snapshot of the completed checkpoints summary stats.
+	 * @param summary Snapshot of the completed checkpoints summary delay.
 	 * @param history Snapshot of the checkpoint history.
 	 * @param latestRestoredCheckpoint The latest restored checkpoint operation.
 	 */
@@ -74,9 +74,9 @@ public class CheckpointStatsSnapshot implements Serializable {
 	}
 
 	/**
-	 * Returns the snapshotted completed checkpoint summary stats.
+	 * Returns the snapshotted completed checkpoint summary delay.
 	 *
-	 * @return Snapshotted completed checkpoint summary stats.
+	 * @return Snapshotted completed checkpoint summary delay.
 	 */
 	public CompletedCheckpointStatsSummary getSummaryStats() {
 		return summary;

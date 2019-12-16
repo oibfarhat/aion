@@ -283,7 +283,7 @@ public class CompletedCheckpointTest {
 	}
 
 	/**
-	 * Tests that the stats callbacks happen if the callback is registered.
+	 * Tests that the delay callbacks happen if the callback is registered.
 	 */
 	@Test
 	public void testCompletedCheckpointStatsCallbacks() throws Exception {

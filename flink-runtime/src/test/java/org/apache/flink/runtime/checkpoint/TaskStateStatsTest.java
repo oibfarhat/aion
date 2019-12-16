@@ -35,7 +35,7 @@ public class TaskStateStatsTest {
 	private final ThreadLocalRandom rand = ThreadLocalRandom.current();
 
 	/**
-	 * Tests that subtask stats are correctly collected.
+	 * Tests that subtask delay are correctly collected.
 	 */
 	@Test
 	public void testHandInSubtasks() throws Exception {

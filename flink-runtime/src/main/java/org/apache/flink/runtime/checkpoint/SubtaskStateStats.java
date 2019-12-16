@@ -30,7 +30,7 @@ import static org.apache.flink.util.Preconditions.checkArgument;
  * {@link SubtaskState}, and
  * {@link PendingCheckpoint}.
  *
- * <p>This is the smallest immutable unit of the stats.
+ * <p>This is the smallest immutable unit of the delay.
  */
 public class SubtaskStateStats implements Serializable {
 
@@ -61,7 +61,7 @@ public class SubtaskStateStats implements Serializable {
 	private final long alignmentDuration;
 
 	/**
-	 * Creates the stats for a single subtask.
+	 * Creates the delay for a single subtask.
 	 *
 	 * @param subtaskIndex Index of the subtask.
 	 * @param ackTimestamp Timestamp when the acknowledgement of this subtask was received at the coordinator.

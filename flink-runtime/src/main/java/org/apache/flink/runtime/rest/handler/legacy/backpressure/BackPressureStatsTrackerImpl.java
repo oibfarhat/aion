@@ -83,18 +83,18 @@ public class BackPressureStatsTrackerImpl implements BackPressureStatsTracker {
 	private final StackTraceSampleCoordinator coordinator;
 
 	/**
-	 * Completed stats. Important: Job vertex IDs need to be scoped by job ID,
+	 * Completed delay. Important: Job vertex IDs need to be scoped by job ID,
 	 * because they are potentially constant across runs messing up the cached
 	 * data.
 	 */
 	private final Cache<ExecutionJobVertex, OperatorBackPressureStats> operatorStatsCache;
 
-	/** Pending in progress stats. Important: Job vertex IDs need to be scoped
+	/** Pending in progress delay. Important: Job vertex IDs need to be scoped
 	 * by job ID, because they are potentially constant across runs messing up
 	 * the cached data.*/
 	private final Set<ExecutionJobVertex> pendingStats = new HashSet<>();
 
-	/** Cleanup interval for completed stats cache. */
+	/** Cleanup interval for completed delay cache. */
 	private final int cleanUpInterval;
 
 	private final int numSamples;
@@ -103,13 +103,13 @@ public class BackPressureStatsTrackerImpl implements BackPressureStatsTracker {
 
 	private final Time delayBetweenSamples;
 
-	/** Flag indicating whether the stats tracker has been shut down. */
+	/** Flag indicating whether the delay tracker has been shut down. */
 	private boolean shutDown;
 
 	/**
 	 * Creates a back pressure statistics tracker.
 	 *
-	 * @param cleanUpInterval     Clean up interval for completed stats.
+	 * @param cleanUpInterval     Clean up interval for completed delay.
 	 * @param numSamples          Number of stack trace samples when determining back pressure.
 	 * @param delayBetweenSamples Delay between samples when determining back pressure.
 	 */
@@ -141,7 +141,7 @@ public class BackPressureStatsTrackerImpl implements BackPressureStatsTracker {
 				.build();
 	}
 
-	/** Cleanup interval for completed stats cache. */
+	/** Cleanup interval for completed delay cache. */
 	public long getCleanUpInterval() {
 		return cleanUpInterval;
 	}
@@ -150,7 +150,7 @@ public class BackPressureStatsTrackerImpl implements BackPressureStatsTracker {
 	 * Returns back pressure statistics for a operator. Automatically triggers stack trace sampling
 	 * if statistics are not available or outdated.
 	 *
-	 * @param vertex Operator to get the stats for.
+	 * @param vertex Operator to get the delay for.
 	 * @return Back pressure statistics for an operator
 	 */
 	public Optional<OperatorBackPressureStats> getOperatorBackPressureStats(ExecutionJobVertex vertex) {
@@ -168,7 +168,7 @@ public class BackPressureStatsTrackerImpl implements BackPressureStatsTracker {
 	 * statistics. If there is a sample in progress for the operator, the call
 	 * is ignored.
 	 *
-	 * @param vertex Operator to get the stats for.
+	 * @param vertex Operator to get the delay for.
 	 * @return Flag indicating whether a sample with triggered.
 	 */
 	private boolean triggerStackTraceSampleInternal(final ExecutionJobVertex vertex) {
@@ -211,7 +211,7 @@ public class BackPressureStatsTrackerImpl implements BackPressureStatsTracker {
 	 * statistics. If there is a sample in progress for the operator, the call
 	 * is ignored.
 	 *
-	 * @param vertex Operator to get the stats for.
+	 * @param vertex Operator to get the delay for.
 	 * @return Flag indicating whether a sample with triggered.
 	 * @deprecated {@link #getOperatorBackPressureStats(ExecutionJobVertex)} will trigger
 	 * stack trace sampling automatically.
@@ -224,7 +224,7 @@ public class BackPressureStatsTrackerImpl implements BackPressureStatsTracker {
 	}
 
 	/**
-	 * Cleans up the operator stats cache if it contains timed out entries.
+	 * Cleans up the operator delay cache if it contains timed out entries.
 	 *
 	 * <p>The Guava cache only evicts as maintenance during normal operations.
 	 * If this handler is inactive, it will never be cleaned.
@@ -234,9 +234,9 @@ public class BackPressureStatsTrackerImpl implements BackPressureStatsTracker {
 	}
 
 	/**
-	 * Shuts down the stats tracker.
+	 * Shuts down the delay tracker.
 	 *
-	 * <p>Invalidates the cache and clears all pending stats.
+	 * <p>Invalidates the cache and clears all pending delay.
 	 */
 	public void shutDown() {
 		synchronized (lock) {
@@ -286,7 +286,7 @@ public class BackPressureStatsTrackerImpl implements BackPressureStatsTracker {
 						LOG.debug("Failed to gather stack trace sample.", throwable);
 					}
 				} catch (Throwable t) {
-					LOG.error("Error during stats completion.", t);
+					LOG.error("Error during delay completion.", t);
 				} finally {
 					pendingStats.remove(vertex);
 				}
@@ -296,11 +296,11 @@ public class BackPressureStatsTrackerImpl implements BackPressureStatsTracker {
 		}
 
 		/**
-		 * Creates the back pressure stats from a stack trace sample.
+		 * Creates the back pressure delay from a stack trace sample.
 		 *
-		 * @param sample Stack trace sample to base stats on.
+		 * @param sample Stack trace sample to base delay on.
 		 *
-		 * @return Back pressure stats
+		 * @return Back pressure delay
 		 */
 		private OperatorBackPressureStats createStatsFromSample(StackTraceSample sample) {
 			Map<ExecutionAttemptID, List<StackTraceElement[]>> traces = sample.getStackTraces();

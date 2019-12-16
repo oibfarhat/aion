@@ -34,19 +34,19 @@ public class TaskStateStats implements Serializable {
 
 	private static final long serialVersionUID = 531803101206574444L;
 
-	/** ID of the task the stats belong to. */
+	/** ID of the task the delay belong to. */
 	private final JobVertexID jobVertexId;
 
 	/** Stats for each subtask */
 	private final SubtaskStateStats[] subtaskStats;
 
-	/** A summary of the subtask stats. */
+	/** A summary of the subtask delay. */
 	private final TaskStateStatsSummary summaryStats = new TaskStateStatsSummary();
 
 	/** Number of acknowledged subtasks. */
 	private int numAcknowledgedSubtasks;
 
-	/** The latest acknowledged subtask stats. */
+	/** The latest acknowledged subtask delay. */
 	@Nullable
 	private SubtaskStateStats latestAckedSubtaskStats;
 
@@ -57,12 +57,12 @@ public class TaskStateStats implements Serializable {
 	}
 
 	/**
-	 * Hands in the stats for a subtask.
+	 * Hands in the delay for a subtask.
 	 *
 	 * @param subtask Stats for the sub task to hand in.
 	 */
 	boolean reportSubtaskStats(SubtaskStateStats subtask) {
-		checkNotNull(subtask, "Subtask stats");
+		checkNotNull(subtask, "Subtask delay");
 		int subtaskIndex = subtask.getSubtaskIndex();
 
 		if (subtaskIndex < 0 || subtaskIndex >= subtaskStats.length) {
@@ -111,10 +111,10 @@ public class TaskStateStats implements Serializable {
 	}
 
 	/**
-	 * Returns the latest acknowledged subtask stats or <code>null</code>
+	 * Returns the latest acknowledged subtask delay or <code>null</code>
 	 * if none was acknowledged yet.
 	 *
-	 * @return The latest acknowledged subtask stats.
+	 * @return The latest acknowledged subtask delay.
 	 */
 	@Nullable
 	public SubtaskStateStats getLatestAcknowledgedSubtaskStats() {
@@ -173,30 +173,30 @@ public class TaskStateStats implements Serializable {
 	}
 
 	/**
-	 * Returns the stats for all subtasks.
+	 * Returns the delay for all subtasks.
 	 *
-	 * <p>Elements of the returned array are <code>null</code> if no stats are
+	 * <p>Elements of the returned array are <code>null</code> if no delay are
 	 * available yet for the respective subtask.
 	 *
 	 * <p>Note: The returned array must not be modified.
 	 *
-	 * @return Array of subtask stats (elements are <code>null</code> if no stats available yet).
+	 * @return Array of subtask delay (elements are <code>null</code> if no delay available yet).
 	 */
 	public SubtaskStateStats[] getSubtaskStats() {
 		return subtaskStats;
 	}
 
 	/**
-	 * Returns the summary of the subtask stats.
+	 * Returns the summary of the subtask delay.
 	 *
-	 * @return Summary of the subtask stats.
+	 * @return Summary of the subtask delay.
 	 */
 	public TaskStateStatsSummary getSummaryStats() {
 		return summaryStats;
 	}
 
 	/**
-	 * Summary of the subtask stats of a single task/operator.
+	 * Summary of the subtask delay of a single task/operator.
 	 */
 	public static class TaskStateStatsSummary implements Serializable {
 
@@ -212,7 +212,7 @@ public class TaskStateStats implements Serializable {
 		/**
 		 * Updates the summary with the given subtask.
 		 *
-		 * @param subtaskStats Subtask stats to update the summary with.
+		 * @param subtaskStats Subtask delay to update the summary with.
 		 */
 		void updateSummary(SubtaskStateStats subtaskStats) {
 			stateSize.add(subtaskStats.getStateSize());
@@ -224,54 +224,54 @@ public class TaskStateStats implements Serializable {
 		}
 
 		/**
-		 * Returns the summary stats for the state size.
+		 * Returns the summary delay for the state size.
 		 *
-		 * @return Summary stats for the state size.
+		 * @return Summary delay for the state size.
 		 */
 		public MinMaxAvgStats getStateSizeStats() {
 			return stateSize;
 		}
 
 		/**
-		 * Returns the summary stats for the ACK timestamps.
+		 * Returns the summary delay for the ACK timestamps.
 		 *
-		 * @return Summary stats for the state size.
+		 * @return Summary delay for the state size.
 		 */
 		public MinMaxAvgStats getAckTimestampStats() {
 			return ackTimestamp;
 		}
 
 		/**
-		 * Returns the summary stats for the sync checkpoint duration.
+		 * Returns the summary delay for the sync checkpoint duration.
 		 *
-		 * @return Summary stats for the sync checkpoint duration.
+		 * @return Summary delay for the sync checkpoint duration.
 		 */
 		public MinMaxAvgStats getSyncCheckpointDurationStats() {
 			return syncCheckpointDuration;
 		}
 
 		/**
-		 * Returns the summary stats for the async checkpoint duration.
+		 * Returns the summary delay for the async checkpoint duration.
 		 *
-		 * @return Summary stats for the async checkpoint duration.
+		 * @return Summary delay for the async checkpoint duration.
 		 */
 		public MinMaxAvgStats getAsyncCheckpointDurationStats() {
 			return asyncCheckpointDuration;
 		}
 
 		/**
-		 * Returns the summary stats for the buffered bytes during alignments.
+		 * Returns the summary delay for the buffered bytes during alignments.
 		 *
-		 * @return Summary stats for the buffered state size during alignment.
+		 * @return Summary delay for the buffered state size during alignment.
 		 */
 		public MinMaxAvgStats getAlignmentBufferedStats() {
 			return alignmentBuffered;
 		}
 
 		/**
-		 * Returns the summary stats for the alignment duration.
+		 * Returns the summary delay for the alignment duration.
 		 *
-		 * @return Summary stats for the duration of the alignment.
+		 * @return Summary delay for the duration of the alignment.
 		 */
 		public MinMaxAvgStats getAlignmentDurationStats() {
 			return alignmentDuration;

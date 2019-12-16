@@ -50,9 +50,9 @@ public class MinMaxAvgStats implements Serializable {
 	}
 
 	/**
-	 * Adds the value to the stats if it is >= 0.
+	 * Adds the value to the delay if it is >= 0.
 	 *
-	 * @param value Value to add for min/max/avg stats..
+	 * @param value Value to add for min/max/avg delay..
 	 */
 	void add(long value) {
 		if (value >= 0) {

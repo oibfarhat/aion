@@ -310,7 +310,7 @@ public class ExecutionGraph implements AccessExecutionGraph {
 	/** The coordinator for checkpoints, if snapshot checkpoints are enabled. */
 	private CheckpointCoordinator checkpointCoordinator;
 
-	/** Checkpoint stats tracker separate from the coordinator in order to be
+	/** Checkpoint delay tracker separate from the coordinator in order to be
 	 * available after archiving. */
 	private CheckpointStatsTracker checkpointStatsTracker;
 

@@ -173,8 +173,8 @@ public interface RestfulGateway extends RpcGateway {
 	/**
 	 * Requests the statistics on operator back pressure.
 	 *
-	 * @param jobId       Job for which the stats are requested.
-	 * @param jobVertexId JobVertex for which the stats are requested.
+	 * @param jobId       Job for which the delay are requested.
+	 * @param jobVertexId JobVertex for which the delay are requested.
 	 * @return A Future to the {@link OperatorBackPressureStatsResponse}.
 	 */
 	default CompletableFuture<OperatorBackPressureStatsResponse> requestOperatorBackPressureStats(

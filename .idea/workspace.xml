@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="79c30036-2824-4b55-9088-de7ac2dba0ee" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/functions/windowing/delay/NormalizedDelay.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/functions/windowing/delay/StreamDelayStats.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/AbstractCheckpointStats.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/AbstractCheckpointStats.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/CheckpointCoordinator.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/CheckpointCoordinator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/CheckpointStatsHistory.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/CheckpointStatsHistory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/CheckpointStatsSnapshot.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/CheckpointStatsSnapshot.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/CheckpointStatsTracker.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/CheckpointStatsTracker.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/CompletedCheckpoint.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/CompletedCheckpoint.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/CompletedCheckpointStats.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/CompletedCheckpointStats.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/CompletedCheckpointStatsSummary.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/CompletedCheckpointStatsSummary.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/FailedCheckpointStats.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/FailedCheckpointStats.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/MinMaxAvgStats.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/MinMaxAvgStats.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/OperatorSubtaskState.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/OperatorSubtaskState.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/PendingCheckpoint.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/PendingCheckpoint.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/PendingCheckpointStats.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/PendingCheckpointStats.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/RestoredCheckpointStats.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/RestoredCheckpointStats.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/SubtaskState.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/SubtaskState.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/SubtaskStateStats.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/SubtaskStateStats.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/TaskStateStats.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/checkpoint/TaskStateStats.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/executiongraph/ExecutionGraph.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/executiongraph/ExecutionGraph.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/io/network/metrics/InputGateMetrics.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/io/network/metrics/InputGateMetrics.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/io/network/metrics/ResultPartitionMetrics.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/io/network/metrics/ResultPartitionMetrics.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/io/network/netty/NettyBufferPool.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/io/network/netty/NettyBufferPool.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/io/network/partition/PipelinedSubpartition.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/io/network/partition/PipelinedSubpartition.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/jobmaster/JobMaster.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/jobmaster/JobMaster.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/jobmaster/JobMasterGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/jobmaster/JobMasterGateway.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/operators/hash/InPlaceMutableHashTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/operators/hash/InPlaceMutableHashTable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/query/QueryableStateUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/query/QueryableStateUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/rest/handler/job/checkpoints/CheckpointStatsCache.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/rest/handler/job/checkpoints/CheckpointStatsCache.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/rest/handler/legacy/backpressure/BackPressureStatsTracker.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/rest/handler/legacy/backpressure/BackPressureStatsTracker.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/rest/handler/legacy/backpressure/BackPressureStatsTrackerImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/rest/handler/legacy/backpressure/BackPressureStatsTrackerImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/rest/messages/JobVertexBackPressureInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/rest/messages/JobVertexBackPressureInfo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/rest/messages/checkpoints/CheckpointStatistics.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/rest/messages/checkpoints/CheckpointStatistics.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/taskmanager/MemoryLogger.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/taskmanager/MemoryLogger.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/webmonitor/RestfulGateway.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/main/java/org/apache/flink/runtime/webmonitor/RestfulGateway.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/test/java/org/apache/flink/runtime/checkpoint/CheckpointCoordinatorTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/test/java/org/apache/flink/runtime/checkpoint/CheckpointCoordinatorTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/test/java/org/apache/flink/runtime/checkpoint/CheckpointStatsHistoryTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/test/java/org/apache/flink/runtime/checkpoint/CheckpointStatsHistoryTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/test/java/org/apache/flink/runtime/checkpoint/CheckpointStatsTrackerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/test/java/org/apache/flink/runtime/checkpoint/CheckpointStatsTrackerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/test/java/org/apache/flink/runtime/checkpoint/CompletedCheckpointStatsSummaryTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/test/java/org/apache/flink/runtime/checkpoint/CompletedCheckpointStatsSummaryTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/test/java/org/apache/flink/runtime/checkpoint/CompletedCheckpointTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/test/java/org/apache/flink/runtime/checkpoint/CompletedCheckpointTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/test/java/org/apache/flink/runtime/checkpoint/PendingCheckpointStatsTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/test/java/org/apache/flink/runtime/checkpoint/PendingCheckpointStatsTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/test/java/org/apache/flink/runtime/checkpoint/PendingCheckpointTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/test/java/org/apache/flink/runtime/checkpoint/PendingCheckpointTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/test/java/org/apache/flink/runtime/checkpoint/TaskStateStatsTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/test/java/org/apache/flink/runtime/checkpoint/TaskStateStatsTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/test/java/org/apache/flink/runtime/io/network/util/DeserializationUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/test/java/org/apache/flink/runtime/io/network/util/DeserializationUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/test/java/org/apache/flink/runtime/metrics/utils/SystemResourcesCounterTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/test/java/org/apache/flink/runtime/metrics/utils/SystemResourcesCounterTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-runtime/src/test/java/org/apache/flink/runtime/rest/handler/legacy/backpressure/BackPressureStatsTrackerImplTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-runtime/src/test/java/org/apache/flink/runtime/rest/handler/legacy/backpressure/BackPressureStatsTrackerImplTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/environment/StreamExecutionEnvironment.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/environment/StreamExecutionEnvironment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/StreamSourceContexts.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/StreamSourceContexts.java" afterDir="false" />
+    </list>
+    <ignored path="$PROJECT_DIR$/flink-runtime/target/" />
+    <ignored path="$PROJECT_DIR$/target/" />
+    <ignored path="$PROJECT_DIR$/flink-streaming-java/target/" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FUSProjectUsageTrigger">
+    <session id="1273099111">
+      <usages-collector id="statistics.lifecycle.project">
+        <counts>
+          <entry key="project.open.time.5" value="1" />
+          <entry key="project.opened" value="1" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.open">
+        <counts>
+          <entry key="java" value="21" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.open">
+        <counts>
+          <entry key="JAVA" value="21" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.edit">
+        <counts>
+          <entry key="dummy" value="16" />
+          <entry key="java" value="842" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.edit">
+        <counts>
+          <entry key="JAVA" value="842" />
+          <entry key="PLAIN_TEXT" value="16" />
+        </counts>
+      </usages-collector>
+    </session>
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/StreamSource.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="638">
+              <caret line="51" lean-forward="true" selection-start-line="51" selection-end-line="51" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/environment/StreamPlanEnvironment.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="725">
+              <caret line="47" column="9" lean-forward="true" selection-start-line="47" selection-start-column="9" selection-end-line="47" selection-end-column="9" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/environment/StreamContextEnvironment.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-232">
+              <caret line="3" column="20" selection-start-line="3" selection-start-column="17" selection-end-line="3" selection-end-column="20" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/environment/StreamExecutionEnvironment.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1276">
+              <caret line="148" column="4" selection-start-line="148" selection-start-column="4" selection-end-line="148" selection-end-column="4" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/TimeCharacteristic.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1316">
+              <caret line="84" column="13" selection-start-line="84" selection-start-column="13" selection-end-line="84" selection-end-column="13" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/StreamSourceContexts.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="937">
+              <caret line="298" column="41" lean-forward="true" selection-start-line="298" selection-start-column="41" selection-end-line="298" selection-end-column="41" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="class#AutomaticWatermarkContext#0;class#StreamSourceContexts#0" />
+                <element signature="e#11714#11715#0" expanded="true" />
+                <element signature="e#11749#11750#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/StreamOperator.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="550">
+              <caret line="46" column="17" selection-start-line="46" selection-start-column="17" selection-end-line="46" selection-end-column="17" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/runtime/operators/windowing/WindowOperator.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-20591">
+              <caret line="99" column="9" selection-start-line="99" selection-start-column="9" selection-end-line="99" selection-end-column="9" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/runtime/tasks/ProcessingTimeService.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="792">
+              <caret line="97" column="7" lean-forward="true" selection-start-line="97" selection-start-column="7" selection-end-line="97" selection-end-column="7" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/functions/AssignerWithPeriodicWatermarks.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="676">
+              <caret line="52" column="17" selection-start-line="52" selection-start-column="17" selection-end-line="52" selection-end-column="17" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>collectWithTimestamp</find>
+      <find>SRC</find>
+      <find>TimeCharacter</find>
+      <find>watermark</find>
+      <find>ManualWatermarkContext</find>
+      <find>TimeChara</find>
+      <find>public</find>
+      <find>addSource</find>
+      <find>addSource(</find>
+      <find>setTimeCharacteristic</find>
+      <find>add</find>
+    </findStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/stats/StreamDelayStats.java" />
+        <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/stats/NormalizedDelay.java" />
+        <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/functions/windowing/delay/NormalizedDelay.java" />
+        <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/StreamSourceContexts.java" />
+        <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/TimeCharacteristic.java" />
+        <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/environment/StreamExecutionEnvironment.java" />
+      </list>
+    </option>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="enabledProfiles">
+      <list>
+        <option value="scala-2.11" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds" extendedState="4">
+    <option name="x" value="1569" />
+    <option name="y" value="35" />
+    <option name="width" value="1431" />
+    <option name="height" value="1965" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="watslack" type="b2602c69:ProjectViewProjectNode" />
+              <item name="watslack" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1576518626231" />
+    <property name="last_opened_file_path" value="$USER_HOME$/flink-benchmarks" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="org.apache.flink.streaming.api.functions.windowing" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="ClojureREPL" factoryName="Local" activateToolWindowBeforeRun="false">
+      <setting name="replType" value="NREPL" />
+      <setting name="execution" value="LEININGEN" />
+      <module name="" />
+      <setting name="jvmArgs" value="" />
+      <setting name="parameters" value="" />
+      <setting name="workingDir" value="" />
+      <setting name="profiles" value="" />
+      <setting name="aliases" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="ClojureREPL" factoryName="Remote" activateToolWindowBeforeRun="false">
+      <setting name="host" value="" />
+      <setting name="port" value="0" />
+      <setting name="replType" value="0" />
+      <module name="" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="79c30036-2824-4b55-9088-de7ac2dba0ee" name="Default Changelist" comment="" />
+      <created>1576513456914</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1576513456914</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="1569" y="35" width="1431" height="1965" extended-state="4" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Designer" />
+      <window_info id="Image Layers" />
+      <window_info id="DB Browser" />
+      <window_info id="UI Designer" />
+      <window_info id="Favorites" side_tool="true" />
+      <window_info id="Capture Tool" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.75725985" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info anchor="bottom" id="DB Execution Console" />
+      <window_info anchor="bottom" id="Terminal" />
+      <window_info anchor="bottom" id="Event Log" side_tool="true" />
+      <window_info anchor="bottom" id="Compute Code Lines" />
+      <window_info anchor="bottom" id="Version Control" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.3299941" />
+      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="right" id="Palette" />
+      <window_info anchor="right" id="Capture Analysis" />
+      <window_info anchor="right" id="Maven Projects" />
+      <window_info anchor="right" id="Leiningen" />
+      <window_info anchor="right" id="Palette&#9;" />
+      <window_info anchor="right" id="Theme Preview" />
+      <window_info anchor="right" id="REPL" side_tool="true" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+    </layout>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/AbstractUdfStreamOperator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="551">
+          <caret line="51" column="48" lean-forward="true" selection-start-line="51" selection-start-column="48" selection-end-line="51" selection-end-column="48" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/functions/source/SourceFunction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="995">
+          <caret line="253" column="26" lean-forward="true" selection-start-line="253" selection-start-column="26" selection-end-line="253" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/InternalTimer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="377">
+          <caret line="35" column="30" selection-start-line="35" selection-start-column="17" selection-end-line="35" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/TimestampedCollector.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="464">
+          <caret line="34" column="13" selection-start-line="34" selection-start-column="13" selection-end-line="34" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/OnWatermarkCallback.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="319">
+          <caret line="30" column="17" selection-start-line="30" selection-start-column="17" selection-end-line="30" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/functions/windowing/AggregateApplyWindowFunction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="551">
+          <caret line="41" column="13" selection-start-line="41" selection-start-column="13" selection-end-line="41" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/functions/windowing/delay/StreamDelayStats.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="145">
+          <caret line="5" column="33" selection-start-line="5" selection-start-column="17" selection-end-line="5" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/functions/windowing/delay/NormalizedDelay.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="435">
+          <caret line="15" column="5" selection-start-line="15" selection-start-column="5" selection-end-line="15" selection-end-column="5" />
+          <folding>
+            <element signature="e#185#186#0" expanded="true" />
+            <element signature="e#218#219#0" expanded="true" />
+            <element signature="e#320#321#0" expanded="true" />
+            <element signature="e#351#352#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/functions/AssignerWithPunctuatedWatermarks.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1401">
+          <caret line="85" column="1" selection-start-line="85" selection-end-line="85" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/functions/AssignerWithPeriodicWatermarks.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="676">
+          <caret line="52" column="17" selection-start-line="52" selection-start-column="17" selection-end-line="52" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/runtime/tasks/ProcessingTimeService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="792">
+          <caret line="97" column="7" lean-forward="true" selection-start-line="97" selection-start-column="7" selection-end-line="97" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/runtime/operators/windowing/WindowOperator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-20591">
+          <caret line="99" column="9" selection-start-line="99" selection-start-column="9" selection-end-line="99" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/StreamSourceContexts.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="937">
+          <caret line="298" column="41" lean-forward="true" selection-start-line="298" selection-start-column="41" selection-end-line="298" selection-end-column="41" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="class#AutomaticWatermarkContext#0;class#StreamSourceContexts#0" />
+            <element signature="e#11714#11715#0" expanded="true" />
+            <element signature="e#11749#11750#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/StreamOperator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="550">
+          <caret line="46" column="17" selection-start-line="46" selection-start-column="17" selection-end-line="46" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/StreamSource.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="638">
+          <caret line="51" lean-forward="true" selection-start-line="51" selection-end-line="51" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/environment/StreamPlanEnvironment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="725">
+          <caret line="47" column="9" lean-forward="true" selection-start-line="47" selection-start-column="9" selection-end-line="47" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/TimeCharacteristic.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1316">
+          <caret line="84" column="13" selection-start-line="84" selection-start-column="13" selection-end-line="84" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/environment/StreamExecutionEnvironment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1276">
+          <caret line="148" column="4" selection-start-line="148" selection-start-column="4" selection-end-line="148" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/environment/StreamContextEnvironment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-232">
+          <caret line="3" column="20" selection-start-line="3" selection-start-column="17" selection-end-line="3" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ProjectJDKs.UI">
+        <settings>
+          <last-edited>1.8</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
+  </component>
+</project>

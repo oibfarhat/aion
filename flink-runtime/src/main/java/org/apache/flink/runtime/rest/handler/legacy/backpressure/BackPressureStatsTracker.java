@@ -32,13 +32,13 @@ public interface BackPressureStatsTracker {
 	 * Returns back pressure statistics for a operator. Automatically triggers stack trace sampling
 	 * if statistics are not available or outdated.
 	 *
-	 * @param vertex Operator to get the stats for.
+	 * @param vertex Operator to get the delay for.
 	 * @return Back pressure statistics for an operator
 	 */
 	Optional<OperatorBackPressureStats> getOperatorBackPressureStats(ExecutionJobVertex vertex);
 
 	/**
-	 * Cleans up the operator stats cache if it contains timed out entries.
+	 * Cleans up the operator delay cache if it contains timed out entries.
 	 *
 	 * <p>The Guava cache only evicts as maintenance during normal operations.
 	 * If this handler is inactive, it will never be cleaned.

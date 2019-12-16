@@ -31,7 +31,7 @@ import java.util.ArrayDeque;
 public final class DeserializationUtils {
 
 	/**
-	 * Iterates over the provided records to deserialize, verifies the results and stats
+	 * Iterates over the provided records to deserialize, verifies the results and delay
 	 * the number of full records.
 	 *
 	 * @param records records to be deserialized

@@ -76,30 +76,30 @@ public class CompletedCheckpointStatsSummary implements Serializable {
 	}
 
 	/**
-	 * Returns the summary stats for the state size of completed checkpoints.
+	 * Returns the summary delay for the state size of completed checkpoints.
 	 *
-	 * @return Summary stats for the state size.
+	 * @return Summary delay for the state size.
 	 */
 	public MinMaxAvgStats getStateSizeStats() {
 		return stateSize;
 	}
 
 	/**
-	 * Returns the summary stats for the duration of completed checkpoints.
+	 * Returns the summary delay for the duration of completed checkpoints.
 	 *
-	 * @return Summary stats for the duration.
+	 * @return Summary delay for the duration.
 	 */
 	public MinMaxAvgStats getEndToEndDurationStats() {
 		return duration;
 	}
 
 	/**
-	 * Returns the summary stats for the bytes buffered during alignment.
+	 * Returns the summary delay for the bytes buffered during alignment.
 	 *
 	 * <p>If no alignments are reported or happen (at least once mode), the
-	 * returned stats are in their initial state.
+	 * returned delay are in their initial state.
 	 *
-	 * @return Summary stats for the bytes buffered during alignment.
+	 * @return Summary delay for the bytes buffered during alignment.
 	 */
 	public MinMaxAvgStats getAlignmentBufferedStats() {
 		return alignmentBuffered;

@@ -488,7 +488,7 @@ public class InPlaceMutableHashTable<T> extends AbstractMutableHashTable<T> {
 	 * @return String containing a summary of the memory consumption for error messages
 	 */
 	private String getMemoryConsumptionString() {
-		return "InPlaceMutableHashTable memory stats:\n" +
+		return "InPlaceMutableHashTable memory delay:\n" +
 			"Total memory:     " + numAllMemorySegments * segmentSize + "\n" +
 			"Free memory:      " + freeMemorySegments.size() * segmentSize + "\n" +
 			"Bucket area:      " + numBuckets * 8  + "\n" +

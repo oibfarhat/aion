@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 public class CompletedCheckpointStatsSummaryTest {
 
 	/**
-	 * Tests simple updates of the completed checkpoint stats.
+	 * Tests simple updates of the completed checkpoint delay.
 	 */
 	@Test
 	public void testSimpleUpdates() throws Exception {

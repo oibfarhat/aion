@@ -304,9 +304,9 @@ public class CheckpointCoordinator {
 	}
 
 	/**
-	 * Sets the checkpoint stats tracker.
+	 * Sets the checkpoint delay tracker.
 	 *
-	 * @param statsTracker The checkpoint stats tracker.
+	 * @param statsTracker The checkpoint delay tracker.
 	 */
 	public void setCheckpointStatsTracker(@Nullable CheckpointStatsTracker statsTracker) {
 		this.statsTracker = statsTracker;

@@ -195,7 +195,7 @@ public class CheckpointStatsTrackerTest {
 		assertEquals(2, counts.getNumberOfCompletedCheckpoints());
 		assertEquals(1, counts.getNumberOfFailedCheckpoints());
 
-		// Summary stats
+		// Summary delay
 		CompletedCheckpointStatsSummary summary = snapshot.getSummaryStats();
 		assertEquals(2, summary.getStateSizeStats().getCount());
 		assertEquals(2, summary.getEndToEndDurationStats().getCount());
@@ -322,7 +322,7 @@ public class CheckpointStatsTrackerTest {
 	}
 
 	/**
-	 * Tests that the metrics are updated properly. We had a bug that required new stats
+	 * Tests that the metrics are updated properly. We had a bug that required new delay
 	 * snapshots in order to update the metrics.
 	 */
 	@Test

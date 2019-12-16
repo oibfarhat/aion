@@ -64,7 +64,7 @@ public class SubtaskState implements CompositeStateHandle {
 	/**
 	 * The state size. This is also part of the deserialized state handle.
 	 * We store it here in order to not deserialize the state handle when
-	 * gathering stats.
+	 * gathering delay.
 	 */
 	private final long stateSize;
 

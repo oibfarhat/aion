@@ -109,7 +109,7 @@ public class PendingCheckpoint {
 
 	private boolean discarded;
 
-	/** Optional stats tracker callback. */
+	/** Optional delay tracker callback. */
 	@Nullable
 	private PendingCheckpointStats statsCallback;
 
@@ -203,7 +203,7 @@ public class PendingCheckpoint {
 	/**
 	 * Sets the callback for tracking this pending checkpoint.
 	 *
-	 * @param trackerCallback Callback for collecting subtask stats.
+	 * @param trackerCallback Callback for collecting subtask delay.
 	 */
 	void setStatsCallback(@Nullable PendingCheckpointStats trackerCallback) {
 		this.statsCallback = trackerCallback;
@@ -300,7 +300,7 @@ public class PendingCheckpoint {
 	 *
 	 * @param executionAttemptId of the acknowledged task
 	 * @param operatorSubtaskStates of the acknowledged task
-	 * @param metrics Checkpoint metrics for the stats
+	 * @param metrics Checkpoint metrics for the delay
 	 * @return TaskAcknowledgeResult of the operation
 	 */
 	public TaskAcknowledgeResult acknowledgeTask(

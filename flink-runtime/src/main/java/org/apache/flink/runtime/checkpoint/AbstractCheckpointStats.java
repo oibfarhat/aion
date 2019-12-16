@@ -60,7 +60,7 @@ public abstract class AbstractCheckpointStats implements Serializable {
 		this.checkpointId = checkpointId;
 		this.triggerTimestamp = triggerTimestamp;
 		this.taskStats = checkNotNull(taskStats);
-		checkArgument(taskStats.size() > 0, "Empty task stats");
+		checkArgument(taskStats.size() > 0, "Empty task delay");
 		checkArgument(numberOfSubtasks > 0, "Non-positive number of subtasks");
 		this.numberOfSubtasks = numberOfSubtasks;
 		this.props = checkNotNull(props);
@@ -97,10 +97,10 @@ public abstract class AbstractCheckpointStats implements Serializable {
 	public abstract long getAlignmentBuffered();
 
 	/**
-	 * Returns the latest acknowledged subtask stats or <code>null</code> if
+	 * Returns the latest acknowledged subtask delay or <code>null</code> if
 	 * none was acknowledged yet.
 	 *
-	 * @return Latest acknowledged subtask stats or <code>null</code>
+	 * @return Latest acknowledged subtask delay or <code>null</code>
 	 */
 	@Nullable
 	public abstract SubtaskStateStats getLatestAcknowledgedSubtaskStats();
@@ -142,20 +142,20 @@ public abstract class AbstractCheckpointStats implements Serializable {
 	}
 
 	/**
-	 * Returns the task state stats for the given job vertex ID or
+	 * Returns the task state delay for the given job vertex ID or
 	 * <code>null</code> if no task with such an ID is available.
 	 *
-	 * @param jobVertexId Job vertex ID of the task stats to look up.
-	 * @return The task state stats instance for the given ID or <code>null</code>.
+	 * @param jobVertexId Job vertex ID of the task delay to look up.
+	 * @return The task state delay instance for the given ID or <code>null</code>.
 	 */
 	public TaskStateStats getTaskStateStats(JobVertexID jobVertexId) {
 		return taskStats.get(jobVertexId);
 	}
 
 	/**
-	 * Returns all task state stats instances.
+	 * Returns all task state delay instances.
 	 *
-	 * @return All task state stats instances.
+	 * @return All task state delay instances.
 	 */
 	public Collection<TaskStateStats> getAllTaskStateStats() {
 		return taskStats.values();

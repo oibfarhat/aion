@@ -45,7 +45,7 @@ public class RestoredCheckpointStats implements Serializable {
 	private final String externalPath;
 
 	/**
-	 * Creates a new restored checkpoint stats.
+	 * Creates a new restored checkpoint delay.
 	 *
 	 * @param checkpointId ID of the checkpoint.
 	 * @param props Checkpoint properties of the checkpoint.

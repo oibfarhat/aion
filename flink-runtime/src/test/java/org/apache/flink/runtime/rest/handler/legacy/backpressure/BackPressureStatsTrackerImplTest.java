@@ -99,7 +99,7 @@ public class BackPressureStatsTrackerImplTest extends TestLogger {
 				Matchers.eq(delayBetweenSamples),
 				Matchers.eq(BackPressureStatsTrackerImpl.MAX_STACK_TRACE_DEPTH));
 
-		// Request back pressure stats again. This should not trigger another sample request
+		// Request back pressure delay again. This should not trigger another sample request
 		Assert.assertTrue(!tracker.getOperatorBackPressureStats(jobVertex).isPresent());
 
 		Mockito.verify(sampleCoordinator, Mockito.times(1)).triggerStackTraceSample(
@@ -139,7 +139,7 @@ public class BackPressureStatsTrackerImplTest extends TestLogger {
 
 		OperatorBackPressureStats stats = tracker.getOperatorBackPressureStats(jobVertex).get();
 
-		// Verify the stats
+		// Verify the delay
 		Assert.assertEquals(sampleId, stats.getSampleId());
 		Assert.assertEquals(endTime, stats.getEndTimestamp());
 		Assert.assertEquals(taskVertices.length, stats.getNumberOfSubTasks());

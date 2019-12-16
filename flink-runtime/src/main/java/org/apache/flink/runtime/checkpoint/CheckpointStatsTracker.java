@@ -41,13 +41,13 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
  * <p>This is tightly integrated with the {@link CheckpointCoordinator} in
  * order to ease the gathering of fine-grained statistics.
  *
- * <p>The tracked stats include summary counts, a detailed history of recent
+ * <p>The tracked delay include summary counts, a detailed history of recent
  * and in progress checkpoints as well as summaries about the size, duration
  * and more of recent checkpoints.
  *
  * <p>Data is gathered via callbacks in the {@link CheckpointCoordinator} and
  * related classes like {@link PendingCheckpoint} and {@link CompletedCheckpoint},
- * which receive the raw stats data in the first place.
+ * which receive the raw delay data in the first place.
  *
  * <p>The statistics are accessed via {@link #createSnapshot()} and exposed via
  * both the web frontend and the {@link Metric} system.
@@ -55,9 +55,9 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 public class CheckpointStatsTracker {
 
 	/**
-	 * Lock used to update stats and creating snapshots. Updates always happen
+	 * Lock used to update delay and creating snapshots. Updates always happen
 	 * from a single Thread at a time and there can be multiple concurrent read
-	 * accesses to the latest stats snapshot.
+	 * accesses to the latest delay snapshot.
 	 *
 	 * <p>Currently, writes are executed by whatever Thread executes the coordinator
 	 * actions (which already happens in locked scope). Reads can come from
@@ -74,7 +74,7 @@ public class CheckpointStatsTracker {
 	/** Checkpoint counts. */
 	private final CheckpointStatsCounts counts = new CheckpointStatsCounts();
 
-	/** A summary of the completed checkpoint stats. */
+	/** A summary of the completed checkpoint delay. */
 	private final CompletedCheckpointStatsSummary summary = new CompletedCheckpointStatsSummary();
 
 	/** History of checkpoints. */
@@ -102,7 +102,7 @@ public class CheckpointStatsTracker {
 	private volatile CompletedCheckpointStats latestCompletedCheckpoint;
 
 	/**
-	 * Creates a new checkpoint stats tracker.
+	 * Creates a new checkpoint delay tracker.
 	 *
 	 * @param numRememberedCheckpoints Maximum number of checkpoints to remember, including in progress ones.
 	 * @param jobVertices Job vertices involved in the checkpoints.
@@ -150,7 +150,7 @@ public class CheckpointStatsTracker {
 	}
 
 	/**
-	 * Creates a new snapshot of the available stats.
+	 * Creates a new snapshot of the available delay.
 	 *
 	 * @return The latest statistics snapshot.
 	 */
@@ -222,7 +222,7 @@ public class CheckpointStatsTracker {
 	/**
 	 * Callback when a checkpoint is restored.
 	 *
-	 * @param restored The restored checkpoint stats.
+	 * @param restored The restored checkpoint delay.
 	 */
 	void reportRestoredCheckpoint(RestoredCheckpointStats restored) {
 		checkNotNull(restored, "Restored checkpoint");
@@ -241,7 +241,7 @@ public class CheckpointStatsTracker {
 	/**
 	 * Callback when a checkpoint completes.
 	 *
-	 * @param completed The completed checkpoint stats.
+	 * @param completed The completed checkpoint delay.
 	 */
 	private void reportCompletedCheckpoint(CompletedCheckpointStats completed) {
 		statsReadWriteLock.lock();
@@ -262,7 +262,7 @@ public class CheckpointStatsTracker {
 	/**
 	 * Callback when a checkpoint fails.
 	 *
-	 * @param failed The failed checkpoint stats.
+	 * @param failed The failed checkpoint delay.
 	 */
 	private void reportFailedCheckpoint(FailedCheckpointStats failed) {
 		statsReadWriteLock.lock();

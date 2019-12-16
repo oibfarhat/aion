@@ -291,7 +291,7 @@ public class CheckpointStatistics implements ResponseBody {
 				checkpointStatisticsPerTask
 			);
 		} else {
-			throw new IllegalArgumentException("Given checkpoint stats object of type "
+			throw new IllegalArgumentException("Given checkpoint delay object of type "
 				+ checkpointStats.getClass().getName() + " cannot be converted.");
 		}
 	}

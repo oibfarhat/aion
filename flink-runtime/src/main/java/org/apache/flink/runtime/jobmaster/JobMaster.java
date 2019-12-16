@@ -654,7 +654,7 @@ public class JobMaster extends FencedRpcEndpoint<JobMasterId> implements JobMast
 			return CompletableFuture.completedFuture(OperatorBackPressureStatsResponse.of(
 				operatorBackPressureStats.orElse(null)));
 		} catch (FlinkException e) {
-			log.info("Error while requesting operator back pressure stats", e);
+			log.info("Error while requesting operator back pressure delay", e);
 			return FutureUtils.completedExceptionally(e);
 		}
 	}
