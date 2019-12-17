@@ -68,6 +68,8 @@ public class StreamSource<OUT, SRC extends SourceFunction<OUT>> extends Abstract
 			final Output<StreamRecord<OUT>> collector,
 			final OperatorChain<?, ?> operatorChain) throws Exception {
 
+		LOG.info("Running source function in StreamSource!");
+
 		final TimeCharacteristic timeCharacteristic = getOperatorConfig().getTimeCharacteristic();
 
 		final Configuration configuration = this.getContainingTask().getEnvironment().getTaskManagerInfo().getConfiguration();

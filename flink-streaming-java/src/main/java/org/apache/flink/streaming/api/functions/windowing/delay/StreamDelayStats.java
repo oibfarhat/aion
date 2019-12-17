@@ -5,5 +5,5 @@ package org.apache.flink.streaming.api.functions.windowing.delay;
  */
 public interface StreamDelayStats {
 
-    void collectDelay(long timestamp);
+    void collectDelay(long timestamp, long delay);
 }

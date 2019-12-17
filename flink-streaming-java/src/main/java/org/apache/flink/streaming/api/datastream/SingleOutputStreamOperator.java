@@ -56,7 +56,6 @@ public class SingleOutputStreamOperator<T> extends DataStream<T> {
 	 * type because this would lead to problems at runtime.
 	 */
 	private Map<OutputTag<?>, TypeInformation> requestedSideOutputs = new HashMap<>();
-
 	private boolean wasSplitApplied = false;
 
 	protected SingleOutputStreamOperator(StreamExecutionEnvironment environment, Transformation<T> transformation) {
