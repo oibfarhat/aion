@@ -59,7 +59,6 @@ public class StreamSource<OUT, SRC extends SourceFunction<OUT>> extends Abstract
 	public void run(final Object lockingObject,
 			final StreamStatusMaintainer streamStatusMaintainer,
 			final OperatorChain<?, ?> operatorChain) throws Exception {
-
 		run(lockingObject, streamStatusMaintainer, output, operatorChain);
 	}
 
@@ -67,8 +66,6 @@ public class StreamSource<OUT, SRC extends SourceFunction<OUT>> extends Abstract
 			final StreamStatusMaintainer streamStatusMaintainer,
 			final Output<StreamRecord<OUT>> collector,
 			final OperatorChain<?, ?> operatorChain) throws Exception {
-
-		LOG.info("Running source function in StreamSource!");
 
 		final TimeCharacteristic timeCharacteristic = getOperatorConfig().getTimeCharacteristic();
 

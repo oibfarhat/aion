@@ -26,6 +26,8 @@ import org.apache.flink.streaming.api.checkpoint.ExternallyInducedSource;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.streaming.api.operators.StreamSource;
 import org.apache.flink.util.FlinkException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
@@ -47,12 +49,13 @@ import java.util.Optional;
 public class SourceStreamTask<OUT, SRC extends SourceFunction<OUT>, OP extends StreamSource<OUT, SRC>>
 	extends StreamTask<OUT, OP> {
 
+	private static final Logger LOG = LoggerFactory.getLogger(SourceStreamTask.class);
+
 	private static final Runnable SOURCE_POISON_LETTER = () -> {};
 
 	private final LegacySourceFunctionThread sourceThread;
 
 	private volatile boolean externallyInducedCheckpoints;
-
 	/**
 	 * Indicates whether this Task was purposefully finished (by finishTask()), in this case we
 	 * want to ignore exceptions thrown after finishing, to ensure shutdown works smoothly.
@@ -68,6 +71,7 @@ public class SourceStreamTask<OUT, SRC extends SourceFunction<OUT>, OP extends S
 	protected void init() {
 		// we check if the source is actually inducing the checkpoints, rather
 		// than the trigger
+		LOG.info("Init from SourceStreamTask");
 		SourceFunction<?> source = headOperator.getUserFunction();
 		if (source instanceof ExternallyInducedSource) {
 			externallyInducedCheckpoints = true;

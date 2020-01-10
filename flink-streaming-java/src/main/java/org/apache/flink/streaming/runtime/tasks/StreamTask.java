@@ -347,7 +347,7 @@ public abstract class StreamTask<OUT, OP extends StreamOperator<OUT>>
 		boolean disposed = false;
 		try {
 			// -------- Initialize ---------
-			LOG.debug("Initializing {}.", getName());
+			LOG.info("Initializing {}.", getName());
 
 			asyncOperationsThreadPool = Executors.newCachedThreadPool(new ExecutorThreadFactory("AsyncOperations", uncaughtExceptionHandler));
 
@@ -379,7 +379,7 @@ public abstract class StreamTask<OUT, OP extends StreamOperator<OUT>>
 			}
 
 			// -------- Invoke --------
-			LOG.debug("Invoking {}", getName());
+			LOG.info("Invoking {}", getName());
 
 			// we need to make sure that any triggers scheduled in open() cannot be
 			// executed before all operators are opened
