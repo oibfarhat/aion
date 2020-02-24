@@ -3,51 +3,25 @@ package org.apache.flink.streaming.api.operators.watslack;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 /**
- * This class is used to store the mean and standard deviation for each network delay epoch.
+ * This class is used to store the mean and standard deviation for event inter-gen delay.
  * TODO(oibfarhat): Embed statistics.
  */
-public class NetworkDelayDist {
+public class InterEventGenDelayDist {
 
     private final class SubStreamProperties {
         private final long substreamIndex;
-        private double mean;
-        private double sd;
-        private long count;
-        private boolean finalized;
-
-        SubStreamProperties(long substreamIndex) {
-            this.substreamIndex = substreamIndex;
-            this.mean = 0;
-            this.sd = 0;
-            this.count = 0;
-            this.finalized = false;
-        }
+        private final double mean;
+        private final double sd;
+        private final long count;
 
         SubStreamProperties(long substreamIndex, double mean, double sd, long count) {
             this.substreamIndex = substreamIndex;
             this.mean = mean;
             this.sd = sd;
             this.count = count;
-            this.finalized = true;
-        }
-
-        void addElement(long networkDelay) {
-            if (!finalized) {
-                return;
-            }
-            mean += networkDelay;
-            sd += (networkDelay * networkDelay);
-            count++;
-        }
-
-        void finalizeSubstream() {
-            this.finalized = true;
-            if (this.count > 0) {
-                this.mean /= count;
-                this.sd = (this.sd / this.count) - (this.mean * this.mean);
-            }
         }
     }
 
@@ -56,11 +30,11 @@ public class NetworkDelayDist {
     /* Data structures to preserve historical information. */
     private final LinkedList<SubStreamProperties> historicalSubstreams;
     /* Running substreams properties */
-    private final Map<Long, SubStreamProperties> currSubstreams;
+    private final Map<Long, PriorityQueue<Long>> currSubstreams;
     /* Last finalized substream. */
     private long substreamWatermark;
 
-    public NetworkDelayDist(int historySize) {
+    public InterEventGenDelayDist(int historySize) {
         this.historySize = historySize;
         /* Data Structures */
         this.historicalSubstreams = new LinkedList<>();
@@ -72,33 +46,56 @@ public class NetworkDelayDist {
     /*
      * Public interface for the user to add a specific delay.
      */
-    public void addDelay(long substreamIndex, long delay) {
-        SubStreamProperties subStreamProperties = currSubstreams.getOrDefault(substreamIndex, null);
+    public void addGenEvent(long substreamIndex, long genTime) {
+        PriorityQueue<Long> pQueue = currSubstreams.getOrDefault(substreamIndex, null);
 
         // New substream!!
-        if (subStreamProperties == null) {
-            subStreamProperties = new SubStreamProperties(substreamIndex);
-            currSubstreams.put(substreamIndex, subStreamProperties);
+        if (pQueue == null) {
+            pQueue = new PriorityQueue<>();
+            currSubstreams.put(substreamIndex, pQueue);
         }
 
-        subStreamProperties.addElement(delay);
+        pQueue.add(genTime);
     }
 
     /*
      * Public interface for the user to signal an end of a substream
      */
     public void finalizeSubstream(long substreamIndex) {
-        SubStreamProperties props = currSubstreams.remove(substreamIndex);
-        if (props == null) {
-            // TODO(oibfarhat): Add logger
+        PriorityQueue<Long> pQueue = currSubstreams.remove(substreamIndex);
+        if (pQueue == null)
             return;
-        }
 
-        props.finalizeSubstream();
+        SubStreamProperties props;
+        if (pQueue.isEmpty()) {
+            props = new SubStreamProperties(substreamIndex, 0, 0, 0);
+        } else {
+            double runningMean = 0;
+            double runningSD = 0;
+            long size = 0;
+
+            long lastTS = pQueue.poll();
+
+            while (!pQueue.isEmpty()) {
+                long currTS = pQueue.poll();
+                long genDelay = currTS - lastTS;
+                runningMean += genDelay;
+                runningSD += (genDelay * genDelay);
+                size++;
+
+                lastTS = currTS;
+            }
+
+            props = new SubStreamProperties(substreamIndex, runningMean, runningSD, size);
+        }
+        // Add to history
         historicalSubstreams.addLast(props);
         while (historicalSubstreams.size() >= historySize) {
             historicalSubstreams.removeFirst();
         }
+        // Remove from Map
+        pQueue.clear();
+
         this.substreamWatermark = Math.max(this.substreamWatermark, substreamIndex);
     }
 
