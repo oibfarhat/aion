@@ -62,7 +62,7 @@ public class StreamSourceContexts {
 		LOG.info("Identifying Source context of TC=%d", timeCharacteristic);
 		switch (timeCharacteristic) {
 			case EventTime:
-				LOG.info("Source context: WatSlack!");
+				LOG.info("Source context: watslack!");
 				ctx = new WatSlackWatermarkContext<>(
 						output,
 						processingTimeService,
