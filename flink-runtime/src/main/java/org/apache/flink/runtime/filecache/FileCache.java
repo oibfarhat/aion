@@ -99,7 +99,7 @@ public class FileCache {
 		storageDirectories = new File[tempDirectories.length];
 
 		for (int i = 0; i < tempDirectories.length; i++) {
-			String cacheDirName = "flink-dist-cache-" + UUID.randomUUID().toString();
+			String cacheDirName = "flink-distributions-cache-" + UUID.randomUUID().toString();
 			storageDirectories[i] = new File(tempDirectories[i], cacheDirName);
 			String path = storageDirectories[i].getAbsolutePath();
 

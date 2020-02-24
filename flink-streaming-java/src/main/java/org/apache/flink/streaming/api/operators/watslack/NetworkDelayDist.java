@@ -1,32 +1,38 @@
 package org.apache.flink.streaming.api.operators.watslack;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
 /**
- * This class is used to store the mean and standard deviation for each network delay epoch.
+ * This class is used to store the mean and standard deviation for each network delay substream (ss).
  * TODO(oibfarhat): Embed statistics.
  */
 public class NetworkDelayDist {
 
-    private final class SubStreamProperties {
-        private final long substreamIndex;
-        private double mean;
-        private double sd;
-        private long count;
+    protected static final Logger LOG = LoggerFactory.getLogger(NetworkDelayDist.class);
+
+    final class SSDelayProp {
+        private final long ssIndex;
         private boolean finalized;
 
-        SubStreamProperties(long substreamIndex) {
-            this.substreamIndex = substreamIndex;
+        double mean;
+        double sd;
+        long count;
+
+        SSDelayProp(long ssIndex) {
+            this.ssIndex = ssIndex;
             this.mean = 0;
             this.sd = 0;
             this.count = 0;
             this.finalized = false;
         }
 
-        SubStreamProperties(long substreamIndex, double mean, double sd, long count) {
-            this.substreamIndex = substreamIndex;
+        SSDelayProp(long ssIndex, double mean, double sd, long count) {
+            this.ssIndex = ssIndex;
             this.mean = mean;
             this.sd = sd;
             this.count = count;
@@ -51,65 +57,65 @@ public class NetworkDelayDist {
         }
     }
 
-    /* Size of substream info to maintain. */
+    /* Size of ss info to maintain. */
     private final int historySize;
     /* Data structures to preserve historical information. */
-    private final LinkedList<SubStreamProperties> historicalSubstreams;
-    /* Running substreams properties */
-    private final Map<Long, SubStreamProperties> currSubstreams;
-    /* Last finalized substream. */
-    private long substreamWatermark;
+    private final LinkedList<SSDelayProp> historicalSSList;
+    /* Running sss properties */
+    private final Map<Long, SSDelayProp> runningSSMap;
+    /* Last finalized ss. */
+    private long ssWatermark;
 
     public NetworkDelayDist(int historySize) {
         this.historySize = historySize;
         /* Data Structures */
-        this.historicalSubstreams = new LinkedList<>();
-        this.currSubstreams = new HashMap<>();
+        this.historicalSSList = new LinkedList<>();
+        this.runningSSMap = new HashMap<>();
 
-        this.substreamWatermark = 0;
+        this.ssWatermark = 0;
     }
 
     /*
      * Public interface for the user to add a specific delay.
      */
-    public void addDelay(long substreamIndex, long delay) {
-        SubStreamProperties subStreamProperties = currSubstreams.getOrDefault(substreamIndex, null);
+    public void add(long ssIndex, long delay) {
+        SSDelayProp subStreamProperties = runningSSMap.getOrDefault(ssIndex, null);
 
-        // New substream!!
+        // New ss!!
         if (subStreamProperties == null) {
-            subStreamProperties = new SubStreamProperties(substreamIndex);
-            currSubstreams.put(substreamIndex, subStreamProperties);
+            subStreamProperties = new SSDelayProp(ssIndex);
+            runningSSMap.put(ssIndex, subStreamProperties);
         }
 
         subStreamProperties.addElement(delay);
     }
 
     /*
-     * Public interface for the user to signal an end of a substream
+     * Public interface for the user to signal an end of a ss
      */
-    public void finalizeSubstream(long substreamIndex) {
-        SubStreamProperties props = currSubstreams.remove(substreamIndex);
+    public void finalize(long ssIndex) {
+        SSDelayProp props = runningSSMap.remove(ssIndex);
         if (props == null) {
-            // TODO(oibfarhat): Add logger
+            LOG.info("Finalizing ss %d", ssIndex);
             return;
         }
 
         props.finalizeSubstream();
-        historicalSubstreams.addLast(props);
-        while (historicalSubstreams.size() >= historySize) {
-            historicalSubstreams.removeFirst();
+        historicalSSList.addLast(props);
+        while (historicalSSList.size() >= historySize) {
+            historicalSSList.removeFirst();
         }
-        this.substreamWatermark = Math.max(this.substreamWatermark, substreamIndex);
+        this.ssWatermark = Math.max(this.ssWatermark, ssIndex);
     }
 
     /*
-     * Summarize substream
+     * Summarize ss
      */
-    public SubStreamProperties estimateSubstream(long substreamIndex) {
+    public SSDelayProp estimate(long ssIndex) {
         // Pull from history
-        if (this.substreamWatermark > substreamIndex) {
-            for (SubStreamProperties subStreamProperties : historicalSubstreams)
-                if (subStreamProperties.substreamIndex == substreamIndex)
+        if (this.ssWatermark > ssIndex) {
+            for (SSDelayProp subStreamProperties : historicalSSList)
+                if (subStreamProperties.ssIndex == ssIndex)
                     return subStreamProperties;
             // Element not found, too old
             return null;
@@ -118,12 +124,12 @@ public class NetworkDelayDist {
         double mean = 0;
         double sd = 0;
         long count = 0;
-        for (SubStreamProperties historicalSubStream : historicalSubstreams) {
+        for (SSDelayProp historicalSubStream : historicalSSList) {
             mean += historicalSubStream.mean;
             sd += historicalSubStream.sd;
             count++;
         }
-        return new SubStreamProperties(substreamIndex, mean / count, sd / count, count);
+        return new SSDelayProp(ssIndex, mean / count, sd / count, count);
     }
 }
 

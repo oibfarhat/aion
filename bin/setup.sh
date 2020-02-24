@@ -6,7 +6,7 @@ bin=`cd "$bin"; pwd`
 . "$bin"/config.sh
 
 # Apache Mirror link
-APACHE_MIRROR="https://archive.apache.org/dist"
+APACHE_MIRROR="https://archive.apache.org/distributions"
 
 init_magellan_from_github(){
      # If Apache Flink is not built

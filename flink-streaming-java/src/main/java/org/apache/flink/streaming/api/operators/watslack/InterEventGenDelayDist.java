@@ -11,14 +11,14 @@ import java.util.PriorityQueue;
  */
 public class InterEventGenDelayDist {
 
-    private final class SubStreamProperties {
-        private final long substreamIndex;
-        private final double mean;
-        private final double sd;
+    final class SSGenProp {
+        private final long ssIndex;
+        final double mean;
+        final double sd;
         private final long count;
 
-        SubStreamProperties(long substreamIndex, double mean, double sd, long count) {
-            this.substreamIndex = substreamIndex;
+        SSGenProp(long ssIndex, double mean, double sd, long count) {
+            this.ssIndex = ssIndex;
             this.mean = mean;
             this.sd = sd;
             this.count = count;
@@ -28,17 +28,17 @@ public class InterEventGenDelayDist {
     /* Size of substream info to maintain. */
     private final int historySize;
     /* Data structures to preserve historical information. */
-    private final LinkedList<SubStreamProperties> historicalSubstreams;
+    private final LinkedList<SSGenProp> historicalSSList;
     /* Running substreams properties */
-    private final Map<Long, PriorityQueue<Long>> currSubstreams;
+    private final Map<Long, PriorityQueue<Long>> runningSSMap;
     /* Last finalized substream. */
     private long substreamWatermark;
 
     public InterEventGenDelayDist(int historySize) {
         this.historySize = historySize;
         /* Data Structures */
-        this.historicalSubstreams = new LinkedList<>();
-        this.currSubstreams = new HashMap<>();
+        this.historicalSSList = new LinkedList<>();
+        this.runningSSMap = new HashMap<>();
 
         this.substreamWatermark = 0;
     }
@@ -46,13 +46,13 @@ public class InterEventGenDelayDist {
     /*
      * Public interface for the user to add a specific delay.
      */
-    public void addGenEvent(long substreamIndex, long genTime) {
-        PriorityQueue<Long> pQueue = currSubstreams.getOrDefault(substreamIndex, null);
+    public void add(long substreamIndex, long genTime) {
+        PriorityQueue<Long> pQueue = runningSSMap.getOrDefault(substreamIndex, null);
 
         // New substream!!
         if (pQueue == null) {
             pQueue = new PriorityQueue<>();
-            currSubstreams.put(substreamIndex, pQueue);
+            runningSSMap.put(substreamIndex, pQueue);
         }
 
         pQueue.add(genTime);
@@ -61,14 +61,14 @@ public class InterEventGenDelayDist {
     /*
      * Public interface for the user to signal an end of a substream
      */
-    public void finalizeSubstream(long substreamIndex) {
-        PriorityQueue<Long> pQueue = currSubstreams.remove(substreamIndex);
+    public void finalize(long ssIndex) {
+        PriorityQueue<Long> pQueue = runningSSMap.remove(ssIndex);
         if (pQueue == null)
             return;
 
-        SubStreamProperties props;
+        SSGenProp props;
         if (pQueue.isEmpty()) {
-            props = new SubStreamProperties(substreamIndex, 0, 0, 0);
+            props = new SSGenProp(ssIndex, 0, 0, 0);
         } else {
             double runningMean = 0;
             double runningSD = 0;
@@ -86,27 +86,27 @@ public class InterEventGenDelayDist {
                 lastTS = currTS;
             }
 
-            props = new SubStreamProperties(substreamIndex, runningMean, runningSD, size);
+            props = new SSGenProp(ssIndex, runningMean, runningSD, size);
         }
         // Add to history
-        historicalSubstreams.addLast(props);
-        while (historicalSubstreams.size() >= historySize) {
-            historicalSubstreams.removeFirst();
+        historicalSSList.addLast(props);
+        while (historicalSSList.size() >= historySize) {
+            historicalSSList.removeFirst();
         }
         // Remove from Map
         pQueue.clear();
 
-        this.substreamWatermark = Math.max(this.substreamWatermark, substreamIndex);
+        this.substreamWatermark = Math.max(this.substreamWatermark, ssIndex);
     }
 
     /*
      * Summarize substream
      */
-    public SubStreamProperties estimateSubstream(long substreamIndex) {
+    public SSGenProp estimate(long ssIndex) {
         // Pull from history
-        if (this.substreamWatermark > substreamIndex) {
-            for (SubStreamProperties subStreamProperties : historicalSubstreams)
-                if (subStreamProperties.substreamIndex == substreamIndex)
+        if (this.substreamWatermark > ssIndex) {
+            for (SSGenProp subStreamProperties : historicalSSList)
+                if (subStreamProperties.ssIndex == ssIndex)
                     return subStreamProperties;
             // Element not found, too old
             return null;
@@ -115,12 +115,12 @@ public class InterEventGenDelayDist {
         double mean = 0;
         double sd = 0;
         long count = 0;
-        for (SubStreamProperties historicalSubStream : historicalSubstreams) {
+        for (SSGenProp historicalSubStream : historicalSSList) {
             mean += historicalSubStream.mean;
             sd += historicalSubStream.sd;
             count++;
         }
-        return new SubStreamProperties(substreamIndex, mean / count, sd / count, count);
+        return new SSGenProp(ssIndex, mean / count, sd / count, count);
     }
 }
 

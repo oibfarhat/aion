@@ -19,8 +19,10 @@ package org.apache.flink.streaming.api.operators;
 
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
-import org.apache.flink.streaming.api.functions.windowing.delay.NormalizedDelay;
-import org.apache.flink.streaming.api.functions.windowing.delay.StreamDelayStats;
+import org.apache.flink.streaming.api.operators.watslack.InterEventGenDelayDist;
+import org.apache.flink.streaming.api.operators.watslack.NetworkDelayDist;
+import org.apache.flink.streaming.api.operators.watslack.SSSampleSizeEstimator;
+import org.apache.flink.streaming.api.operators.watslack.SSSizeEstimator;
 import org.apache.flink.streaming.api.watermark.Watermark;
 import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;
 import org.apache.flink.streaming.runtime.streamstatus.StreamStatus;
@@ -31,6 +33,7 @@ import org.apache.flink.util.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.*;
 import java.util.concurrent.ScheduledFuture;
 
 /**
@@ -62,12 +65,12 @@ public class StreamSourceContexts {
 		LOG.info("Identifying Source context of TC=%d", timeCharacteristic);
 		switch (timeCharacteristic) {
 			case EventTime:
-				LOG.info("Source context: watslack!");
 				ctx = new WatSlackWatermarkContext<>(
 						output,
 						processingTimeService,
-                        // TODO(oibfarhat): Place in configs m=30
-						new NormalizedDelay(30),
+						new NetworkDelayDist(1024),
+						new InterEventGenDelayDist(1024),
+						100, // Watermark every 100ms
 						checkpointLock,
 						streamStatusMaintainer,
 						idleTimeout);
@@ -290,59 +293,104 @@ public class StreamSourceContexts {
 
         private final Output<StreamRecord<T>> output;
         private final StreamRecord<T> reuse;
+        /* WatSlack Distributions & Estimators */
+        private final NetworkDelayDist streamNetDelay;
+        private final InterEventGenDelayDist streamGenDelay;
+        private final SSSizeEstimator ssSizeEstimator;
+        private final SSSampleSizeEstimator ssSampleSizeEstimator;
 
-        private final StreamDelayStats stats;
+		private final long watermarkFrequency;
+
+		/* WatSlack Specific Data Structures */
+		private Set<Long> observedSSSet;
+		private Map<Long, Long> eventsProcPerSSMap;
+
+		/* Utils */
+		private final Random random;
 
         private WatSlackWatermarkContext(
                 final Output<StreamRecord<T>> output,
                 final ProcessingTimeService timeService,
-                final StreamDelayStats stats,
+                final NetworkDelayDist streamNetDelay,
+                final InterEventGenDelayDist streamGenDelay,
+                final long watermarkFrequency,
                 final Object checkpointLock,
                 final StreamStatusMaintainer streamStatusMaintainer,
                 final long idleTimeout) {
             super(timeService, checkpointLock, streamStatusMaintainer, idleTimeout);
+            LOG.info("WatSlack", "Running StreamSourceContexts");
 
             this.output = Preconditions.checkNotNull(output, "The output cannot be null.");
-            this.stats = Preconditions.checkNotNull(stats, "StreamDelayStats cannot be null.");
+			this.reuse = new StreamRecord<>(null);
 
-            this.reuse = new StreamRecord<>(null);
+            /* WatSlack Estimators */
+            this.streamNetDelay = Preconditions.checkNotNull(streamNetDelay, "The NetworkDelayDist cannot be null.");
+			this.streamGenDelay = Preconditions.checkNotNull(streamGenDelay, "The InterEventGenDelayDist cannot be null.");
+			this.watermarkFrequency = watermarkFrequency;
+			this.ssSizeEstimator =
+					new SSSizeEstimator(this.streamNetDelay, this.streamGenDelay, this.watermarkFrequency);
+            this.ssSampleSizeEstimator = new SSSampleSizeEstimator(this.ssSizeEstimator);
+			/* Watermark specific Data Structures */
+			this.observedSSSet = new HashSet<>();
+			this.eventsProcPerSSMap = new HashMap<>();
+
+			this.random = new Random();
         }
 
         @Override
         protected void processAndCollect(T element) {
             throw new UnsupportedOperationException("Use processAndCollectWithTimestamp");
-//            output.collect(reuse.replace(element, lastRecordTime));
-//
-//            // this is to avoid lock contention in the lockingObject by
-//            // sending the watermark before the firing of the watermark
-//            // emission task.
-//            if (lastRecordTime > nextWatermarkTime) {
-//                // in case we jumped some watermarks, recompute the next watermark time
-//                final long watermarkTime = lastRecordTime - (lastRecordTime % watermarkInterval);
-//                nextWatermarkTime = watermarkTime + watermarkInterval;
-//                output.emitWatermark(new Watermark(watermarkTime));
-//
-//                // we do not need to register another timer here
-//                // because t StreamTaskSchedulerPolicy schedulerPolicy,he emitting task will do so.
-//            }
         }
 
         @Override
         protected void processAndCollectWithTimestamp(T element, long timestamp) {
-            output.collect(reuse.replace(element, timestamp));
+        	/*
+        	 * The algorithm is divided into 3 steps:
+        	 * 1) Collect timestamp
+        	 * 2) Sampling algorithm
+        	 * 3) Watermark Emission
+        	 */
+			long ssIndex = (long) Math.ceil(timestamp / (watermarkFrequency * 1.0));
+			if (!observedSSSet.contains(ssIndex)) {
+				observedSSSet.add(ssIndex);
+				eventsProcPerSSMap.put(ssIndex, 0L);
+			}
 
-            stats.collectDelay(timestamp, this.timeService.getCurrentProcessingTime() - timestamp);
-            processAndCollect(element);
+			// 1) Collect event timestamp.
+			streamNetDelay.add(ssIndex, this.timeService.getCurrentProcessingTime() - timestamp);
+			streamGenDelay.add(ssIndex, timestamp);
 
-			// TODO(oibfarhat): We do not emit watermark for now
-            if (false) {
-//                output.emitWatermark(new Watermark());
-            }
+			// 2) Sampling algorithm.
+			long processedPerSS = eventsProcPerSSMap.get(ssIndex);
+			// Let us do it with rate = 0.9 for now.
+			if (random.nextDouble() <= 0.9) {
+				output.collect(reuse.replace(element, timestamp));
+				eventsProcPerSSMap.put(ssIndex, ++processedPerSS);
+			} else {
+				LOG.info("Dropped a tuple");
+			}
+
+			/*
+			 * 3) Watermark Emission
+			 *
+			 * Watermarks are emitted in one of two cases:
+			 * 	a) θ events were collected; or
+			 * 	b) time expired.
+			 */
+
+			// Check a)
+			long targetSampleSize = ssSampleSizeEstimator.estimate(ssIndex);
+			if (processedPerSS >= targetSampleSize) {
+			    // Substream is done!
+                streamNetDelay.finalize(ssIndex);
+                output.emitWatermark(new Watermark(ssIndex * (watermarkFrequency + 1)));
+
+			}
+			LOG.info("Watermark algorithm here!");
         }
 
         @Override
         protected boolean allowWatermark(Watermark mark) {
-            // allow Long.MAX_VALUE since this is the special end-watermark that for example the Kafka source emits
             return mark.getTimestamp() == Long.MAX_VALUE;
         }
 

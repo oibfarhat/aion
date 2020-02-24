@@ -11,6 +11,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: org.apache.flink:flink-runtime_2.11:1.9.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.apache.flink:flink-runtime_2.11:test-jar:tests:1.9.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-core:1.9.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-annotations:1.9.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-metrics-core:1.9.0" level="project" />
