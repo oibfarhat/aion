@@ -223,7 +223,8 @@ public class RemoteStreamEnvironment extends StreamExecutionEnvironment {
 		String jobName,
 		SavepointRestoreSettings savepointRestoreSettings
 	) throws ProgramInvocationException {
-		StreamGraph streamGraph = streamExecutionEnvironment.getStreamGraph(jobName);
+		StreamGraph streamGraph = streamExecutionEnvironment.getStreamGraph();
+		streamGraph.setJobName(jobName);
 		return executeRemotely(streamGraph,
 			streamExecutionEnvironment.getClass().getClassLoader(),
 			streamExecutionEnvironment.getConfig(),
@@ -255,7 +256,7 @@ public class RemoteStreamEnvironment extends StreamExecutionEnvironment {
 			LOG.info("Running remotely at {}:{}", host, port);
 		}
 
-		ClassLoader userCodeClassLoader = JobWithJars.buildUserCodeClassLoader(jarFiles, globalClasspaths, envClassLoader);
+		ClassLoader userCodeClassLoader = JobWithJars.buildUserCodeClassLoader(jarFiles, globalClasspaths, envClassLoader, clientConfiguration);
 
 		Configuration configuration = new Configuration();
 		configuration.addAll(clientConfiguration);
@@ -302,7 +303,9 @@ public class RemoteStreamEnvironment extends StreamExecutionEnvironment {
 	}
 
 	@Override
-	public JobExecutionResult execute(StreamGraph streamGraph) throws Exception {
+	public JobExecutionResult execute(String jobName) throws ProgramInvocationException {
+		StreamGraph streamGraph = getStreamGraph();
+		streamGraph.setJobName(jobName);
 		transformations.clear();
 		return executeRemotely(streamGraph, jarFiles);
 	}

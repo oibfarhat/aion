@@ -110,6 +110,7 @@ public class StreamNetworkThroughputBenchmark {
 			senderBufferPoolSize,
 			receiverBufferPoolSize,
 			config);
+		receiver = environment.createReceiver();
 		writerThreads = new LongRecordWriterThread[recordWriters];
 		for (int writer = 0; writer < recordWriters; writer++) {
 			writerThreads[writer] = new LongRecordWriterThread(
@@ -117,7 +118,6 @@ public class StreamNetworkThroughputBenchmark {
 				broadcastMode);
 			writerThreads[writer].start();
 		}
-		receiver = environment.createReceiver();
 	}
 
 	/**

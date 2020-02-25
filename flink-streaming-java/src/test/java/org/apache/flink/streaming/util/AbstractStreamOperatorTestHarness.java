@@ -52,14 +52,12 @@ import org.apache.flink.streaming.api.operators.AbstractStreamOperatorTest;
 import org.apache.flink.streaming.api.operators.OperatorSnapshotFinalizer;
 import org.apache.flink.streaming.api.operators.OperatorSnapshotFutures;
 import org.apache.flink.streaming.api.operators.Output;
-import org.apache.flink.streaming.api.operators.SetupableStreamOperator;
 import org.apache.flink.streaming.api.operators.StreamOperator;
 import org.apache.flink.streaming.api.operators.StreamTaskStateInitializer;
 import org.apache.flink.streaming.api.operators.StreamTaskStateInitializerImpl;
 import org.apache.flink.streaming.api.watermark.Watermark;
 import org.apache.flink.streaming.runtime.streamrecord.LatencyMarker;
 import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;
-import org.apache.flink.streaming.runtime.streamstatus.StreamStatus;
 import org.apache.flink.streaming.runtime.tasks.ProcessingTimeService;
 import org.apache.flink.streaming.runtime.tasks.StreamTask;
 import org.apache.flink.streaming.runtime.tasks.TestProcessingTimeService;
@@ -269,30 +267,28 @@ public class AbstractStreamOperatorTestHarness<OUT> implements AutoCloseable {
 	}
 
 	/**
-	 * Calls {@link SetupableStreamOperator#setup(StreamTask, StreamConfig, Output)} ()}.
+	 * Calls {@link StreamOperator#setup(StreamTask, StreamConfig, Output)} ()}.
 	 */
 	public void setup() {
 		setup(null);
 	}
 
 	/**
-	 * Calls {@link SetupableStreamOperator#setup(StreamTask, StreamConfig, Output)} ()}.
+	 * Calls {@link StreamOperator#setup(StreamTask, StreamConfig, Output)} ()}.
 	 */
 	public void setup(TypeSerializer<OUT> outputSerializer) {
 		if (!setupCalled) {
 			streamTaskStateInitializer =
 				createStreamTaskStateManager(environment, stateBackend, processingTimeService);
 			mockTask.setStreamTaskStateInitializer(streamTaskStateInitializer);
-			if (operator instanceof SetupableStreamOperator) {
-				((SetupableStreamOperator) operator).setup(mockTask, config, new MockOutput(outputSerializer));
-			}
+			operator.setup(mockTask, config, new MockOutput(outputSerializer));
 			setupCalled = true;
 		}
 	}
 
 	/**
 	 * Calls {@link org.apache.flink.streaming.api.operators.StreamOperator#initializeState()}.
-	 * Calls {@link org.apache.flink.streaming.api.operators.SetupableStreamOperator#setup(StreamTask, StreamConfig, Output)}
+	 * Calls {@link org.apache.flink.streaming.api.operators.StreamOperator#setup(StreamTask, StreamConfig, Output)}
 	 * if it was not called before.
 	 *
 	 */
@@ -376,7 +372,7 @@ public class AbstractStreamOperatorTestHarness<OUT> implements AutoCloseable {
 
 	/**
 	 * Calls {@link org.apache.flink.streaming.api.operators.StreamOperator#initializeState()}.
-	 * Calls {@link org.apache.flink.streaming.api.operators.SetupableStreamOperator#setup(StreamTask, StreamConfig, Output)}
+	 * Calls {@link org.apache.flink.streaming.api.operators.StreamOperator#setup(StreamTask, StreamConfig, Output)}
 	 * if it was not called before.
 	 *
 	 * @param jmOperatorStateHandles the primary state (owned by JM)
@@ -475,7 +471,7 @@ public class AbstractStreamOperatorTestHarness<OUT> implements AutoCloseable {
 
 	/**
 	 * Calls {@link StreamOperator#open()}. This also
-	 * calls {@link SetupableStreamOperator#setup(StreamTask, StreamConfig, Output)}
+	 * calls {@link StreamOperator#setup(StreamTask, StreamConfig, Output)}
 	 * if it was not called before.
 	 */
 	public void open() throws Exception {
@@ -524,9 +520,7 @@ public class AbstractStreamOperatorTestHarness<OUT> implements AutoCloseable {
 		}
 		setupCalled = false;
 
-		if (internalEnvironment.isPresent()) {
-			internalEnvironment.get().close();
-		}
+		internalEnvironment.ifPresent(MockEnvironment::close);
 	}
 
 	public void setProcessingTime(long time) throws Exception {
@@ -565,11 +559,6 @@ public class AbstractStreamOperatorTestHarness<OUT> implements AutoCloseable {
 		} else {
 			throw new UnsupportedOperationException();
 		}
-	}
-
-	@VisibleForTesting
-	public StreamStatus getStreamStatus() {
-		return mockTask.getStreamStatusMaintainer().getStreamStatus();
 	}
 
 	private class MockOutput implements Output<StreamRecord<OUT>> {

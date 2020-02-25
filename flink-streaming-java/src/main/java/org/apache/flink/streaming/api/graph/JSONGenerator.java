@@ -18,6 +18,7 @@
 package org.apache.flink.streaming.api.graph;
 
 import org.apache.flink.annotation.Internal;
+import org.apache.flink.streaming.api.operators.StreamOperator;
 
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ArrayNode;
@@ -185,6 +186,8 @@ public class JSONGenerator {
 		} else {
 			node.put(PACT, "Operator");
 		}
+
+		StreamOperator<?> operator = streamGraph.getStreamNode(vertexID).getOperator();
 
 		node.put(CONTENTS, vertex.getOperatorName());
 

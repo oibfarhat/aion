@@ -9,16 +9,10 @@
         <module name="flink-streaming-java_2.11" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="flink-parent" target="1.8" />
-      <module name="flink-runtime_2.11" target="1.8" />
-      <module name="flink-streaming-java_2.11" target="1.8" />
-    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="flink-parent" options="-Xpkginfo:always" />
-      <module name="flink-runtime_2.11" options="-Xpkginfo:always" />
       <module name="flink-streaming-java_2.11" options="-Xpkginfo:always" />
     </option>
   </component>

@@ -27,7 +27,6 @@ import org.apache.flink.streaming.api.watermark.Watermark;
 import org.apache.flink.streaming.runtime.streamrecord.LatencyMarker;
 import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;
 import org.apache.flink.streaming.runtime.streamstatus.StreamStatusMaintainer;
-import org.apache.flink.streaming.runtime.tasks.OperatorChain;
 import org.apache.flink.streaming.runtime.tasks.ProcessingTimeCallback;
 import org.apache.flink.streaming.runtime.tasks.ProcessingTimeService;
 
@@ -48,24 +47,19 @@ public class StreamSource<OUT, SRC extends SourceFunction<OUT>> extends Abstract
 
 	private transient volatile boolean canceledOrStopped = false;
 
-	private transient volatile boolean hasSentMaxWatermark = false;
-
 	public StreamSource(SRC sourceFunction) {
 		super(sourceFunction);
 
 		this.chainingStrategy = ChainingStrategy.HEAD;
 	}
 
-	public void run(final Object lockingObject,
-			final StreamStatusMaintainer streamStatusMaintainer,
-			final OperatorChain<?, ?> operatorChain) throws Exception {
-		run(lockingObject, streamStatusMaintainer, output, operatorChain);
+	public void run(final Object lockingObject, final StreamStatusMaintainer streamStatusMaintainer) throws Exception {
+		run(lockingObject, streamStatusMaintainer, output);
 	}
 
 	public void run(final Object lockingObject,
 			final StreamStatusMaintainer streamStatusMaintainer,
-			final Output<StreamRecord<OUT>> collector,
-			final OperatorChain<?, ?> operatorChain) throws Exception {
+			final Output<StreamRecord<OUT>> collector) throws Exception {
 
 		final TimeCharacteristic timeCharacteristic = getOperatorConfig().getTimeCharacteristic();
 
@@ -100,14 +94,9 @@ public class StreamSource<OUT, SRC extends SourceFunction<OUT>> extends Abstract
 
 			// if we get here, then the user function either exited after being done (finite source)
 			// or the function was canceled or stopped. For the finite source case, we should emit
-			// a final watermark that indicates that we reached the end of event-time, and end inputs
-			// of the operator chain
+			// a final watermark that indicates that we reached the end of event-time
 			if (!isCanceledOrStopped()) {
-				advanceToEndOfEventTime();
-
-				synchronized (lockingObject) {
-					operatorChain.endInput(1);
-				}
+				ctx.emitWatermark(Watermark.MAX_WATERMARK);
 			}
 		} finally {
 			// make sure that the context is closed in any case
@@ -115,13 +104,6 @@ public class StreamSource<OUT, SRC extends SourceFunction<OUT>> extends Abstract
 			if (latencyEmitter != null) {
 				latencyEmitter.close();
 			}
-		}
-	}
-
-	public void advanceToEndOfEventTime() {
-		if (!hasSentMaxWatermark) {
-			ctx.emitWatermark(Watermark.MAX_WATERMARK);
-			hasSentMaxWatermark = true;
 		}
 	}
 

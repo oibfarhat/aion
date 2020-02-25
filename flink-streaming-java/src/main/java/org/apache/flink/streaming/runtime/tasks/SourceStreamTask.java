@@ -26,10 +26,6 @@ import org.apache.flink.streaming.api.checkpoint.ExternallyInducedSource;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.streaming.api.operators.StreamSource;
 import org.apache.flink.util.FlinkException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Optional;
 
 /**
  * {@link StreamTask} for executing a {@link StreamSource}.
@@ -49,29 +45,16 @@ import java.util.Optional;
 public class SourceStreamTask<OUT, SRC extends SourceFunction<OUT>, OP extends StreamSource<OUT, SRC>>
 	extends StreamTask<OUT, OP> {
 
-	private static final Logger LOG = LoggerFactory.getLogger(SourceStreamTask.class);
-
-	private static final Runnable SOURCE_POISON_LETTER = () -> {};
-
-	private final LegacySourceFunctionThread sourceThread;
-
 	private volatile boolean externallyInducedCheckpoints;
-	/**
-	 * Indicates whether this Task was purposefully finished (by finishTask()), in this case we
-	 * want to ignore exceptions thrown after finishing, to ensure shutdown works smoothly.
-	 */
-	private volatile boolean isFinished = false;
 
 	public SourceStreamTask(Environment env) {
 		super(env);
-		this.sourceThread = new LegacySourceFunctionThread();
 	}
 
 	@Override
 	protected void init() {
 		// we check if the source is actually inducing the checkpoints, rather
 		// than the trigger
-		LOG.info("Init from SourceStreamTask");
 		SourceFunction<?> source = headOperator.getUserFunction();
 		if (source instanceof ExternallyInducedSource) {
 			externallyInducedCheckpoints = true;
@@ -89,7 +72,7 @@ public class SourceStreamTask<OUT, SRC extends SourceFunction<OUT>, OP extends S
 					final CheckpointMetaData checkpointMetaData = new CheckpointMetaData(checkpointId, timestamp);
 
 					try {
-						SourceStreamTask.super.triggerCheckpoint(checkpointMetaData, checkpointOptions, false);
+						SourceStreamTask.super.triggerCheckpoint(checkpointMetaData, checkpointOptions);
 					}
 					catch (RuntimeException | FlinkException e) {
 						throw e;
@@ -105,71 +88,20 @@ public class SourceStreamTask<OUT, SRC extends SourceFunction<OUT>, OP extends S
 	}
 
 	@Override
-	protected void advanceToEndOfEventTime() throws Exception {
-		headOperator.advanceToEndOfEventTime();
-	}
-
-	@Override
 	protected void cleanup() {
 		// does not hold any resources, so no cleanup needed
 	}
 
 	@Override
-	protected void performDefaultAction(ActionContext context) throws Exception {
-		// Against the usual contract of this method, this implementation is not step-wise but blocking instead for
-		// compatibility reasons with the current source interface (source functions run as a loop, not in steps).
-		sourceThread.start();
-
-		// We run an alternative mailbox loop that does not involve default actions and synchronizes around actions.
-		try {
-			runAlternativeMailboxLoop();
-		} catch (Exception mailboxEx) {
-			// We cancel the source function if some runtime exception escaped the mailbox.
-			if (!isCanceled()) {
-				cancelTask();
-			}
-			throw mailboxEx;
-		}
-
-		sourceThread.join();
-		if (!isFinished) {
-			sourceThread.checkThrowSourceExecutionException();
-		}
-
-		context.allActionsCompleted();
-	}
-
-	private void runAlternativeMailboxLoop() throws InterruptedException {
-
-		while (true) {
-
-			Runnable letter = mailbox.takeMail();
-			if (letter == SOURCE_POISON_LETTER) {
-				break;
-			}
-
-			synchronized (getCheckpointLock()) {
-				letter.run();
-			}
-		}
+	protected void run() throws Exception {
+		headOperator.run(getCheckpointLock(), getStreamStatusMaintainer());
 	}
 
 	@Override
-	protected void cancelTask() {
+	protected void cancelTask() throws Exception {
 		if (headOperator != null) {
 			headOperator.cancel();
 		}
-	}
-
-	@Override
-	protected void finishTask() throws Exception {
-		isFinished = true;
-		cancelTask();
-	}
-
-	@Override
-	public Optional<Thread> getExecutingThread() {
-		return Optional.of(sourceThread);
 	}
 
 	// ------------------------------------------------------------------------
@@ -177,43 +109,14 @@ public class SourceStreamTask<OUT, SRC extends SourceFunction<OUT>, OP extends S
 	// ------------------------------------------------------------------------
 
 	@Override
-	public boolean triggerCheckpoint(CheckpointMetaData checkpointMetaData, CheckpointOptions checkpointOptions, boolean advanceToEndOfEventTime) throws Exception {
+	public boolean triggerCheckpoint(CheckpointMetaData checkpointMetaData, CheckpointOptions checkpointOptions) throws Exception {
 		if (!externallyInducedCheckpoints) {
-			return super.triggerCheckpoint(checkpointMetaData, checkpointOptions, advanceToEndOfEventTime);
+			return super.triggerCheckpoint(checkpointMetaData, checkpointOptions);
 		}
 		else {
 			// we do not trigger checkpoints here, we simply state whether we can trigger them
 			synchronized (getCheckpointLock()) {
 				return isRunning();
-			}
-		}
-	}
-
-	/**
-	 * Runnable that executes the the source function in the head operator.
-	 */
-	private class LegacySourceFunctionThread extends Thread {
-
-		private Throwable sourceExecutionThrowable;
-
-		LegacySourceFunctionThread() {
-			this.sourceExecutionThrowable = null;
-		}
-
-		@Override
-		public void run() {
-			try {
-				headOperator.run(getCheckpointLock(), getStreamStatusMaintainer(), operatorChain);
-			} catch (Throwable t) {
-				sourceExecutionThrowable = t;
-			} finally {
-				mailbox.clearAndPut(SOURCE_POISON_LETTER);
-			}
-		}
-
-		void checkThrowSourceExecutionException() throws Exception {
-			if (sourceExecutionThrowable != null) {
-				throw new Exception(sourceExecutionThrowable);
 			}
 		}
 	}

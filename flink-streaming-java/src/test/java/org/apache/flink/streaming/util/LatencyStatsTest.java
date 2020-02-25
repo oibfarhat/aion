@@ -35,6 +35,8 @@ import org.apache.flink.util.TestLogger;
 import org.junit.Assert;
 import org.junit.Test;
 
+import javax.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -203,6 +205,12 @@ public class LatencyStatsTest extends TestLogger {
 
 		@Override
 		public ScopeFormats getScopeFormats() {
+			return null;
+		}
+
+		@Nullable
+		@Override
+		public String getMetricQueryServicePath() {
 			return null;
 		}
 	}

@@ -33,21 +33,21 @@ public class UnionSerializerTest extends SerializerTestBase<TaggedUnion<Object, 
 
 	public UnionSerializerTest() {
 		super(new DeeplyEqualsChecker()
-		.withCustomCheck(
-			(o1, o2) -> o1 instanceof TaggedUnion && o2 instanceof TaggedUnion,
-			(o1, o2, checker) -> {
-				TaggedUnion union1 = (TaggedUnion) o1;
-				TaggedUnion union2 = (TaggedUnion) o2;
+			.withCustomCheck(
+				(o1, o2) -> o1 instanceof TaggedUnion && o2 instanceof TaggedUnion,
+				(o1, o2, checker) -> {
+					TaggedUnion union1 = (TaggedUnion) o1;
+					TaggedUnion union2 = (TaggedUnion) o2;
 
-				if (union1.isOne() && union2.isOne()) {
-					return checker.deepEquals(union1.getOne(), union2.getOne());
-				} else if (union1.isTwo() && union2.isTwo()) {
-					return checker.deepEquals(union1.getTwo(), union2.getTwo());
-				} else {
-					return false;
+					if (union1.isOne() && union2.isOne()) {
+						return checker.deepEquals(union1.getOne(), union2.getOne());
+					} else if (union1.isTwo() && union2.isTwo()) {
+						return checker.deepEquals(union1.getTwo(), union2.getTwo());
+					} else {
+						return false;
+					}
 				}
-			}
-		));
+			));
 	}
 
 	@Override

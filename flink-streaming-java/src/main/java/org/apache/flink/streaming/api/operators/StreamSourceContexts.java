@@ -62,7 +62,6 @@ public class StreamSourceContexts {
 			long idleTimeout) {
 
 		final SourceFunction.SourceContext<OUT> ctx;
-		LOG.info("Identifying Source context of TC=%d", timeCharacteristic);
 		switch (timeCharacteristic) {
 			case EventTime:
 				ctx = new WatSlackWatermarkContext<>(
@@ -83,6 +82,7 @@ public class StreamSourceContexts {
 					checkpointLock,
 					streamStatusMaintainer,
 					idleTimeout);
+
 				break;
 			case ProcessingTime:
 				ctx = new NonTimestampContext<>(checkpointLock, output);
@@ -291,13 +291,13 @@ public class StreamSourceContexts {
 	 */
 	private static class WatSlackWatermarkContext<T> extends WatermarkContext<T> {
 
-        private final Output<StreamRecord<T>> output;
-        private final StreamRecord<T> reuse;
-        /* WatSlack Distributions & Estimators */
-        private final NetworkDelayDist streamNetDelay;
-        private final InterEventGenDelayDist streamGenDelay;
-        private final SSSizeEstimator ssSizeEstimator;
-        private final SSSampleSizeEstimator ssSampleSizeEstimator;
+		private final Output<StreamRecord<T>> output;
+		private final StreamRecord<T> reuse;
+		/* WatSlack Distributions & Estimators */
+		private final NetworkDelayDist streamNetDelay;
+		private final InterEventGenDelayDist streamGenDelay;
+		private final SSSizeEstimator ssSizeEstimator;
+		private final SSSampleSizeEstimator ssSampleSizeEstimator;
 
 		private final long watermarkFrequency;
 
@@ -308,48 +308,48 @@ public class StreamSourceContexts {
 		/* Utils */
 		private final Random random;
 
-        private WatSlackWatermarkContext(
-                final Output<StreamRecord<T>> output,
-                final ProcessingTimeService timeService,
-                final NetworkDelayDist streamNetDelay,
-                final InterEventGenDelayDist streamGenDelay,
-                final long watermarkFrequency,
-                final Object checkpointLock,
-                final StreamStatusMaintainer streamStatusMaintainer,
-                final long idleTimeout) {
-            super(timeService, checkpointLock, streamStatusMaintainer, idleTimeout);
-            LOG.info("WatSlack", "Running StreamSourceContexts");
+		private WatSlackWatermarkContext(
+				final Output<StreamRecord<T>> output,
+				final ProcessingTimeService timeService,
+				final NetworkDelayDist streamNetDelay,
+				final InterEventGenDelayDist streamGenDelay,
+				final long watermarkFrequency,
+				final Object checkpointLock,
+				final StreamStatusMaintainer streamStatusMaintainer,
+				final long idleTimeout) {
+			super(timeService, checkpointLock, streamStatusMaintainer, idleTimeout);
+			LOG.info("WatSlack", "Running StreamSourceContexts");
 
-            this.output = Preconditions.checkNotNull(output, "The output cannot be null.");
+			this.output = Preconditions.checkNotNull(output, "The output cannot be null.");
 			this.reuse = new StreamRecord<>(null);
 
-            /* WatSlack Estimators */
-            this.streamNetDelay = Preconditions.checkNotNull(streamNetDelay, "The NetworkDelayDist cannot be null.");
+			/* WatSlack Estimators */
+			this.streamNetDelay = Preconditions.checkNotNull(streamNetDelay, "The NetworkDelayDist cannot be null.");
 			this.streamGenDelay = Preconditions.checkNotNull(streamGenDelay, "The InterEventGenDelayDist cannot be null.");
 			this.watermarkFrequency = watermarkFrequency;
 			this.ssSizeEstimator =
 					new SSSizeEstimator(this.streamNetDelay, this.streamGenDelay, this.watermarkFrequency);
-            this.ssSampleSizeEstimator = new SSSampleSizeEstimator(this.ssSizeEstimator);
+			this.ssSampleSizeEstimator = new SSSampleSizeEstimator(this.ssSizeEstimator);
 			/* Watermark specific Data Structures */
 			this.observedSSSet = new HashSet<>();
 			this.eventsProcPerSSMap = new HashMap<>();
 
 			this.random = new Random();
-        }
+		}
 
-        @Override
-        protected void processAndCollect(T element) {
-            throw new UnsupportedOperationException("Use processAndCollectWithTimestamp");
-        }
+		@Override
+		protected void processAndCollect(T element) {
+			throw new UnsupportedOperationException("Use processAndCollectWithTimestamp");
+		}
 
-        @Override
-        protected void processAndCollectWithTimestamp(T element, long timestamp) {
-        	/*
-        	 * The algorithm is divided into 3 steps:
-        	 * 1) Collect timestamp
-        	 * 2) Sampling algorithm
-        	 * 3) Watermark Emission
-        	 */
+		@Override
+		protected void processAndCollectWithTimestamp(T element, long timestamp) {
+			/*
+			 * The algorithm is divided into 3 steps:
+			 * 1) Collect timestamp
+			 * 2) Sampling algorithm
+			 * 3) Watermark Emission
+			 */
 			long ssIndex = (long) Math.ceil(timestamp / (watermarkFrequency * 1.0));
 			if (!observedSSSet.contains(ssIndex)) {
 				observedSSSet.add(ssIndex);
@@ -381,33 +381,32 @@ public class StreamSourceContexts {
 			// Check a)
 			long targetSampleSize = ssSampleSizeEstimator.estimate(ssIndex);
 			if (processedPerSS >= targetSampleSize) {
-			    // Substream is done!
-                streamNetDelay.finalize(ssIndex);
-                output.emitWatermark(new Watermark(ssIndex * (watermarkFrequency + 1)));
+				// Substream is done!
+				streamNetDelay.finalize(ssIndex);
+				output.emitWatermark(new Watermark(ssIndex * (watermarkFrequency + 1)));
 
 			}
 			LOG.info("Watermark algorithm here!");
-        }
+		}
 
-        @Override
-        protected boolean allowWatermark(Watermark mark) {
-            return mark.getTimestamp() == Long.MAX_VALUE;
-        }
+		@Override
+		protected boolean allowWatermark(Watermark mark) {
+			return mark.getTimestamp() == Long.MAX_VALUE;
+		}
 
-        /**
-         * This will only be called if allowWatermark returned {@code true}.
-         */
-        @Override
-        protected void processAndEmitWatermark(Watermark mark) {
-            output.emitWatermark(mark);
-        }
+		/**
+		 * This will only be called if allowWatermark returned {@code true}.
+		 */
+		@Override
+		protected void processAndEmitWatermark(Watermark mark) {
+			output.emitWatermark(mark);
+		}
 
-        @Override
-        public void close() {
-            super.close();
-        }
-    }
-
+		@Override
+		public void close() {
+			super.close();
+		}
+	}
 	/**
 	 * A SourceContext for event time. Sources may directly attach timestamps and generate
 	 * watermarks, but if records are emitted without timestamps, no timestamps are automatically

@@ -26,10 +26,8 @@ import org.apache.flink.runtime.io.network.partition.consumer.InputGate;
 import org.apache.flink.runtime.metrics.MetricNames;
 import org.apache.flink.streaming.api.graph.StreamConfig;
 import org.apache.flink.streaming.api.operators.OneInputStreamOperator;
-import org.apache.flink.streaming.runtime.io.StreamOneInputProcessor;
+import org.apache.flink.streaming.runtime.io.StreamInputProcessor;
 import org.apache.flink.streaming.runtime.metrics.WatermarkGauge;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 
@@ -39,7 +37,9 @@ import javax.annotation.Nullable;
 @Internal
 public class OneInputStreamTask<IN, OUT> extends StreamTask<OUT, OneInputStreamOperator<IN, OUT>> {
 
-	private static final Logger LOG = LoggerFactory.getLogger(OneInputStreamTask.class);
+	private StreamInputProcessor<IN> inputProcessor;
+
+	private volatile boolean running = true;
 
 	private final WatermarkGauge inputWatermarkGauge = new WatermarkGauge();
 
@@ -72,13 +72,14 @@ public class OneInputStreamTask<IN, OUT> extends StreamTask<OUT, OneInputStreamO
 	@Override
 	public void init() throws Exception {
 		StreamConfig configuration = getConfiguration();
+
 		TypeSerializer<IN> inSerializer = configuration.getTypeSerializerIn1(getUserCodeClassLoader());
 		int numberOfInputs = configuration.getNumberOfInputs();
 
 		if (numberOfInputs > 0) {
 			InputGate[] inputGates = getEnvironment().getAllInputGates();
 
-			inputProcessor = new StreamOneInputProcessor<>(
+			inputProcessor = new StreamInputProcessor<>(
 					inputGates,
 					inSerializer,
 					this,
@@ -89,12 +90,32 @@ public class OneInputStreamTask<IN, OUT> extends StreamTask<OUT, OneInputStreamO
 					getStreamStatusMaintainer(),
 					this.headOperator,
 					getEnvironment().getMetricGroup().getIOMetricGroup(),
-					inputWatermarkGauge,
-					getTaskNameWithSubtaskAndId(),
-					operatorChain);
+					inputWatermarkGauge);
 		}
 		headOperator.getMetricGroup().gauge(MetricNames.IO_CURRENT_INPUT_WATERMARK, this.inputWatermarkGauge);
 		// wrap watermark gauge since registered metrics must be unique
 		getEnvironment().getMetricGroup().gauge(MetricNames.IO_CURRENT_INPUT_WATERMARK, this.inputWatermarkGauge::getValue);
+	}
+
+	@Override
+	protected void run() throws Exception {
+		// cache processor reference on the stack, to make the code more JIT friendly
+		final StreamInputProcessor<IN> inputProcessor = this.inputProcessor;
+
+		while (running && inputProcessor.processInput()) {
+			// all the work happens in the "processInput" method
+		}
+	}
+
+	@Override
+	protected void cleanup() throws Exception {
+		if (inputProcessor != null) {
+			inputProcessor.cleanup();
+		}
+	}
+
+	@Override
+	protected void cancelTask() {
+		running = false;
 	}
 }

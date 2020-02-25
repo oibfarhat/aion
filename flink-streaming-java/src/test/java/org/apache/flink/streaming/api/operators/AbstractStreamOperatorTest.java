@@ -521,6 +521,7 @@ public class AbstractStreamOperatorTest {
 				CheckpointOptions.forCheckpointWithDefaultLocation(),
 				new MemCheckpointStreamFactory(Integer.MAX_VALUE));
 
+		verify(context).close();
 	}
 
 	/**
@@ -560,6 +561,8 @@ public class AbstractStreamOperatorTest {
 		} catch (Exception e) {
 			assertEquals(failingException, e.getCause());
 		}
+
+		verify(context).close();
 	}
 
 	/**
@@ -641,6 +644,7 @@ public class AbstractStreamOperatorTest {
 
 		// verify that the context has been closed, the operator snapshot result has been cancelled
 		// and that all futures have been cancelled.
+		verify(context).close();
 		verify(operatorSnapshotResult).cancel();
 
 		verify(futureKeyedStateHandle).cancel(anyBoolean());
