@@ -8,7 +8,8 @@ public class NaiveSSlackAlg extends AbstractSSlackAlg {
     }
 
     @Override
-    public double getSamplingRates(int localSSIndex) {
-        return 0.8;
+    public boolean sample(long event) {
+        return true;
     }
+    
 }

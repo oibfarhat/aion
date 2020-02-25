@@ -1,15 +1,27 @@
 package org.apache.flink.streaming.api.operators.watslack.diststore;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.PriorityQueue;
 
 public class GenDelaySSStore implements SSDistStore {
 
-    private final long ssIndex;
+    protected static final Logger LOG = LoggerFactory.getLogger(GenDelaySSStore.class);
 
+    private final long ssIndex;
     private final PriorityQueue<Long> eventsQueue;
+    private double mean;
+    private double sd;
+    private long count;
+    private boolean isPurged;
 
     public GenDelaySSStore(final long ssIndex) {
         this.ssIndex = ssIndex;
+        this.mean = 0;
+        this.sd = 0;
+        this.count = 0;
+        this.isPurged = false;
         this.eventsQueue = new PriorityQueue<>();
     }
 
@@ -20,72 +32,41 @@ public class GenDelaySSStore implements SSDistStore {
 
     @Override
     public void addValue(long eventTime) {
+        if (isPurged) {
+            LOG.warn("Attempting to add a value to a purged substream");
+            return;
+        }
         eventsQueue.add(eventTime);
     }
 
-//    /*
-//     * Public interface for the user to signal an end of a substream
-//     */
-//    public void finalize(long ssIndex) {
-//        PriorityQueue<Long> pQueue = runningSSMap.remove(ssIndex);
-//        if (pQueue == null)
-//            return;
-//
-//        InterEventGenDelayDist.SSGenProp props;
-//        if (pQueue.isEmpty()) {
-//            props = new InterEventGenDelayDist.SSGenProp(ssIndex, 0, 0, 0);
-//        } else {
-//            double runningMean = 0;
-//            double runningSD = 0;
-//            long size = 0;
-//
-//            long lastTS = pQueue.poll();
-//
-//            while (!pQueue.isEmpty()) {
-//                long currTS = pQueue.poll();
-//                long genDelay = currTS - lastTS;
-//                runningMean += genDelay;
-//                runningSD += (genDelay * genDelay);
-//                size++;
-//
-//                lastTS = currTS;
-//            }
-//
-//            props = new InterEventGenDelayDist.SSGenProp(ssIndex, runningMean, runningSD, size);
-//        }
-//        // Add to history
-//        historicalSSList.addLast(props);
-//        while (historicalSSList.size() >= historySize) {
-//            historicalSSList.removeFirst();
-//        }
-//        // Remove from Map
-//        pQueue.clear();
-//
-//        this.substreamWatermark = Math.max(this.substreamWatermark, ssIndex);
-//    }
-//
-//    /*
-//     * Summarize substream
-//     */
-//    public InterEventGenDelayDist.SSGenProp estimate(long ssIndex) {
-//        // Pull from history
-//        if (this.substreamWatermark > ssIndex) {
-//            for (InterEventGenDelayDist.SSGenProp subStreamProperties : historicalSSList)
-//                if (subStreamProperties.ssIndex == ssIndex)
-//                    return subStreamProperties;
-//            // Element not found, too old
-//            return null;
-//        }
-//
-//        double mean = 0;
-//        double sd = 0;
-//        long count = 0;
-//        for (InterEventGenDelayDist.SSGenProp historicalSubStream : historicalSSList) {
-//            mean += historicalSubStream.mean;
-//            sd += historicalSubStream.sd;
-//            count++;
-//        }
-//        return new InterEventGenDelayDist.SSGenProp(ssIndex, mean / count, sd / count, count);
-//    }
+    @Override
+    public void purge() {
+        if (this.isPurged) {
+            LOG.warn("Attempting to purge an already purged substream");
+            return;
+        }
 
+        this.isPurged = true;
+        if (eventsQueue.isEmpty()) {
+            LOG.warn("Purging an empty substream");
+            return;
+        }
+
+        long lastTs = eventsQueue.poll();
+        while (!eventsQueue.isEmpty()) {
+            long currTs = eventsQueue.poll();
+            long genDelay = currTs - lastTs;
+            mean += genDelay;
+            sd += (genDelay * genDelay);
+            count++;
+
+            lastTs = currTs;
+        }
+
+        if (this.count > 0) {
+            this.mean /= count;
+            this.sd = (this.sd / this.count) - (this.mean * this.mean);
+        }
+        this.eventsQueue.clear();
+    }
 }

@@ -21,5 +21,5 @@ public abstract class AbstractSSlackAlg {
         this.ssSize = ssSize;
     }
 
-    public abstract double getSamplingRates(int localSSIndex);
+    public abstract boolean sample(long event);
 }

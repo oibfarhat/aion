@@ -8,4 +8,6 @@ public interface SSDistStore {
     long getSSIndex();
 
     void addValue(long eventTime);
+
+    void purge();
 }

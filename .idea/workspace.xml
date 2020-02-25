@@ -2,22 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5e8215d4-41da-4b7d-a3a2-2353ea73d42c" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/sampling/AbstractSSlackAlg.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/sampling/NaiveSSlackAlg.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/sampling/SSlackAlgFactory.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/WindowSSlack.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/WindowSSlack.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/WindowSSlackManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/WindowSSlackManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/DistStoreManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/DistStoreManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/GenDelaySSStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/GenDelaySSStore.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/NetDelaySSStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/NetDelaySSStore.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/SSDistStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/SSDistStore.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/WindowDistStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/WindowDistStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/garbage/InterEventGenDelayDist.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/garbage/NetworkDelayStore.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/garbage/SSSampleSizeEstimator.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/garbage/SSSizeEstimator.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/estimators/SSSizeEstimator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/sampling/SamplingSlackAlg.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/estimators/SSSizeEstimator.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/estimators/SSSizeEstimator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/sampling/AbstractSSlackAlg.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/sampling/AbstractSSlackAlg.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/sampling/NaiveSSlackAlg.java" beforeDir="false" afterPath="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/sampling/NaiveSSlackAlg.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/target/" />
     <ignored path="$PROJECT_DIR$/flink-streaming-java/target/" />
@@ -39,23 +32,25 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="java" value="51" />
+          <entry key="class" value="1" />
+          <entry key="java" value="77" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="JAVA" value="51" />
+          <entry key="CLASS" value="1" />
+          <entry key="JAVA" value="77" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="dummy" value="201" />
-          <entry key="java" value="10909" />
+          <entry key="java" value="13805" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JAVA" value="10909" />
+          <entry key="JAVA" value="13805" />
           <entry key="PLAIN_TEXT" value="201" />
         </counts>
       </usages-collector>
@@ -64,33 +59,10 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="600">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/GenDelaySSStore.java">
+        <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/WindowSSlackManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1479">
-              <caret line="55" column="27" selection-start-line="55" selection-start-column="20" selection-end-line="55" selection-end-column="27" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/DistStoreManager.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="551">
-              <caret line="19" column="29" lean-forward="true" selection-start-line="19" selection-start-column="29" selection-end-line="19" selection-end-column="29" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#947#948#0" expanded="true" />
-                <element signature="e#1015#1016#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/NetDelaySSStore.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1044">
-              <caret line="38" column="12" selection-start-line="38" selection-start-column="12" selection-end-line="38" selection-end-column="12" />
+            <state relative-caret-position="2030">
+              <caret line="70" column="26" selection-start-line="70" selection-start-column="26" selection-end-line="70" selection-end-column="26" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -99,44 +71,14 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/WindowDistStore.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="58">
-              <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/SSDistStore.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="145">
-              <caret line="5" column="17" selection-start-line="5" selection-start-column="17" selection-end-line="5" selection-end-column="17" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/estimators/SSSizeEstimator.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="290">
-              <caret line="10" column="35" selection-start-line="10" selection-start-column="18" selection-end-line="10" selection-end-column="35" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/WindowSSlack.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="618">
-              <caret line="26" column="7" selection-start-line="26" selection-start-column="7" selection-end-line="26" selection-end-column="7" />
+            <state relative-caret-position="821">
+              <caret line="88" column="35" selection-start-line="88" selection-start-column="29" selection-end-line="88" selection-end-column="35" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#3370#3371#0" expanded="true" />
-                <element signature="e#3404#3405#0" expanded="true" />
+                <element signature="e#3924#3925#0" expanded="true" />
+                <element signature="e#3958#3959#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -145,17 +87,39 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/sampling/AbstractSSlackAlg.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="725">
-              <caret line="25" lean-forward="true" selection-start-line="25" selection-end-line="25" />
+            <state relative-caret-position="667">
+              <caret line="23" column="28" selection-start-line="23" selection-start-column="28" selection-end-line="23" selection-end-column="28" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/sampling/NaiveSSlackAlg.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="377">
+              <caret line="13" column="4" selection-end-line="15" />
+              <folding>
+                <element signature="e#307#308#0" expanded="true" />
+                <element signature="e#335#336#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/sampling/SSlackAlgFactory.java">
+        <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/WindowDistStore.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="58">
-              <caret line="2" column="29" selection-start-line="2" selection-start-column="29" selection-end-line="2" selection-end-column="29" />
+            <state relative-caret-position="725">
+              <caret line="27" column="5" lean-forward="true" selection-start-line="27" selection-start-column="5" selection-end-line="27" selection-end-column="5" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/estimators/SSSizeEstimator.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="986">
+              <caret line="34" lean-forward="true" selection-start-line="34" selection-end-line="34" />
             </state>
           </provider>
         </entry>
@@ -199,16 +163,18 @@
         <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/estimators/diststore/DistStoreManager.java" />
         <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/estimators/diststore/WindowDistStore.java" />
         <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/estimators/diststore/DistStoreBySS.java" />
-        <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/WindowDistStore.java" />
-        <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/NetDelaySSStore.java" />
-        <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/GenDelaySSStore.java" />
-        <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/SSDistStore.java" />
         <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/sampling/SamplingSlackAlg.java" />
         <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/sampling/NaiveSSlack.java" />
-        <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/sampling/NaiveSSlackAlg.java" />
-        <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/WindowSSlackManager.java" />
         <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/DistStoreManager.java" />
+        <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/SSDistStore.java" />
+        <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/NetDelaySSStore.java" />
+        <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/GenDelaySSStore.java" />
+        <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/WindowDistStore.java" />
+        <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/estimators/SSSizeEstimator.java" />
+        <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/WindowSSlackManager.java" />
         <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/WindowSSlack.java" />
+        <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/sampling/AbstractSSlackAlg.java" />
+        <option value="$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/sampling/NaiveSSlackAlg.java" />
       </list>
     </option>
   </component>
@@ -319,7 +285,20 @@
               <item name="api" type="462c0819:PsiDirectoryNode" />
               <item name="operators" type="462c0819:PsiDirectoryNode" />
               <item name="watslack" type="462c0819:PsiDirectoryNode" />
-              <item name="estimators" type="462c0819:PsiDirectoryNode" />
+              <item name="diststore" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="watslack" type="b2602c69:ProjectViewProjectNode" />
+              <item name="watslack" type="462c0819:PsiDirectoryNode" />
+              <item name="flink-streaming-java" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="streaming" type="462c0819:PsiDirectoryNode" />
+              <item name="api" type="462c0819:PsiDirectoryNode" />
+              <item name="operators" type="462c0819:PsiDirectoryNode" />
+              <item name="watslack" type="462c0819:PsiDirectoryNode" />
+              <item name="sampling" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="watslack" type="b2602c69:ProjectViewProjectNode" />
@@ -361,7 +340,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="SearchEverywhereHistoryKey" value="&#9;FILE&#9;file:///home/omarfarhat/watslack/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/estimators/diststore/DistStoreManager.java" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1582667372712" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1582670091312" />
     <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.2" />
@@ -521,48 +500,31 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/sampling/NaiveSSlackAlg.java">
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/estimators/SSSampleSizeEstimator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="406">
-          <caret line="14" lean-forward="true" selection-start-line="14" selection-end-line="14" />
-          <folding>
-            <element signature="e#316#317#0" expanded="true" />
-            <element signature="e#340#341#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="58">
+          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/WindowSSlackManager.java">
+    <entry file="jar:///usr/lib/jvm/java-8-openjdk-amd64/jre/lib/rt.jar!/java/lang/InterruptedException.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1140">
-          <caret line="71" selection-start-line="71" selection-end-line="71" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state relative-caret-position="348">
+          <caret line="17" lean-forward="true" selection-start-line="17" selection-end-line="17" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/NetDelaySSStore.java">
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/SSDistStore.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1044">
-          <caret line="38" column="12" selection-start-line="38" selection-start-column="12" selection-end-line="38" selection-end-column="12" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/GenDelaySSStore.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1479">
-          <caret line="55" column="27" selection-start-line="55" selection-start-column="20" selection-end-line="55" selection-end-column="27" />
+        <state relative-caret-position="203">
+          <caret line="7" column="19" selection-start-line="7" selection-start-column="9" selection-end-line="7" selection-end-column="19" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/DistStoreManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="551">
-          <caret line="19" column="29" lean-forward="true" selection-start-line="19" selection-start-column="29" selection-end-line="19" selection-end-column="29" />
+        <state relative-caret-position="145">
+          <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#947#948#0" expanded="true" />
@@ -571,59 +533,83 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/sampling/AbstractSSlackAlg.java">
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/NetDelaySSStore.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="725">
-          <caret line="25" lean-forward="true" selection-start-line="25" selection-end-line="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/sampling/SSlackAlgFactory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="58">
-          <caret line="2" column="29" selection-start-line="2" selection-start-column="29" selection-end-line="2" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/estimators/SSSizeEstimator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="290">
-          <caret line="10" column="35" selection-start-line="10" selection-start-column="18" selection-end-line="10" selection-end-column="35" />
+        <state relative-caret-position="1245">
+          <caret line="45" lean-forward="true" selection-start-line="45" selection-end-line="45" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/estimators/SSSampleSizeEstimator.java">
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/GenDelaySSStore.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-368">
+          <caret line="7" column="13" selection-start-line="7" selection-start-column="13" selection-end-line="7" selection-end-column="13" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/sampling/SSlackAlgFactory.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="58">
           <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/estimators/SSSizeEstimator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="986">
+          <caret line="34" lean-forward="true" selection-start-line="34" selection-end-line="34" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/WindowDistStore.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="58">
-          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+        <state relative-caret-position="725">
+          <caret line="27" column="5" lean-forward="true" selection-start-line="27" selection-start-column="5" selection-end-line="27" selection-end-column="5" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/diststore/SSDistStore.java">
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/WindowSSlackManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="145">
-          <caret line="5" column="17" selection-start-line="5" selection-start-column="17" selection-end-line="5" selection-end-column="17" />
+        <state relative-caret-position="2030">
+          <caret line="70" column="26" selection-start-line="70" selection-start-column="26" selection-end-line="70" selection-end-column="26" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/WindowSSlack.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="618">
-          <caret line="26" column="7" selection-start-line="26" selection-start-column="7" selection-end-line="26" selection-end-column="7" />
+        <state relative-caret-position="821">
+          <caret line="88" column="35" selection-start-line="88" selection-start-column="29" selection-end-line="88" selection-end-column="35" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3370#3371#0" expanded="true" />
-            <element signature="e#3404#3405#0" expanded="true" />
+            <element signature="e#3924#3925#0" expanded="true" />
+            <element signature="e#3958#3959#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/sampling/AbstractSSlackAlg.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="667">
+          <caret line="23" column="28" selection-start-line="23" selection-start-column="28" selection-end-line="23" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/flink-streaming-java/src/main/java/org/apache/flink/streaming/api/operators/watslack/sampling/NaiveSSlackAlg.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="377">
+          <caret line="13" column="4" selection-end-line="15" />
+          <folding>
+            <element signature="e#307#308#0" expanded="true" />
+            <element signature="e#335#336#0" expanded="true" />
           </folding>
         </state>
       </provider>

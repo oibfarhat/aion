@@ -18,6 +18,7 @@ import java.util.Map;
 public final class WindowSSlackManager {
 
     private static final int HISTORY_SIZE = 1024;
+    static final int MAX_NET_DELAY = 500; // We can tolerate up to 500ms max delay.
 
     private final ProcessingTimeService processingTimeService;
     /* Logical division of windows */
@@ -31,6 +32,9 @@ public final class WindowSSlackManager {
 
     private final Map<Long, WindowSSlack> windowSlacksMap;
 
+    /* Stats purger */
+    private boolean isWarmedUp;
+    private final Thread timestampsPurger;
     /* Metrics */
     private final Counter windowsCounter;
 
@@ -45,10 +49,15 @@ public final class WindowSSlackManager {
         this.ssLength = ssLength;
         this.ssSize = ssSize;
 
-        this.netDelayStoreManager = new DistStoreManager<>(HISTORY_SIZE, windowLength, ssLength, ssSize);
-        this.interEventStoreManager = new DistStoreManager<>(HISTORY_SIZE, windowLength, ssLength, ssSize);
-
+        this.netDelayStoreManager = new DistStoreManager<>(windowLength, ssLength, ssSize);
+        this.interEventStoreManager = new DistStoreManager<>(windowLength, ssLength, ssSize);
         this.windowSlacksMap = new HashMap<>();
+
+        /* Purging */
+        this.isWarmedUp = false;
+        this.timestampsPurger = new Thread(new SSStatsPurger(processingTimeService.getCurrentProcessingTime()));
+        this.timestampsPurger.start();
+        /* Metrics */
         this.windowsCounter = new SimpleCounter();
     }
 
@@ -59,16 +68,17 @@ public final class WindowSSlackManager {
         if (ws == null) {
             WindowDistStore<NetDelaySSStore> netDist = netDelayStoreManager.createWindowDistStore(windowIndex);
             WindowDistStore<GenDelaySSStore> interEventDist = interEventStoreManager.createWindowDistStore(windowIndex);
-
             ws = new WindowSSlack(
                     windowIndex,
                     this,
                     null,
                     windowLength,
                     ssLength,
+                    ssSize,
                     netDist,
                     interEventDist);
             windowSlacksMap.put(windowIndex, ws);
+            // Remove from history
 
             windowsCounter.inc();
         }
@@ -81,5 +91,41 @@ public final class WindowSSlackManager {
 
     final ProcessingTimeService getProcessingTimeService() {
         return processingTimeService;
+    }
+
+    final boolean isWarmedUp() {
+        return isWarmedUp;
+    }
+
+    /* Runnable that purges substreams stats */
+    private class SSStatsPurger implements Runnable {
+
+        private long currTime;
+
+        public SSStatsPurger(long currTime) {
+            this.currTime = currTime;
+        }
+
+        @Override
+        public void run() {
+            long windowIndex = getWindowIndex(currTime);
+            WindowSSlack ws = windowSlacksMap.getOrDefault(windowIndex, null);
+            if (ws != null) {
+                if (!isWarmedUp) {
+                    // We have enough data now!
+                    isWarmedUp = true;
+                }
+                ws.purgeSS(currTime);
+            }
+
+            if (windowSlacksMap.containsKey(windowIndex))
+                try {
+                    Thread.sleep(MAX_NET_DELAY);
+                    currTime += MAX_NET_DELAY;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+        }
     }
 }
