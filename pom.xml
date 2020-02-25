@@ -51,7 +51,6 @@ under the License.
 
 	<modules>
 		<!-- Dummy module to force execution of the Maven Shade plugin (see Shade plugin below) -->
-		<module>flink-runtime</module>
 		<module>flink-streaming-java</module>
 	</modules>
 
