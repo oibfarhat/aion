@@ -3,28 +3,32 @@ package org.apache.flink.streaming.api.operators.watslack.diststore;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DistStoreManager<T extends > {
-    private final long historySize;
+public class DistStoreManager<T extends SSDistStore> {
 
-    private final Map<Long, WindowDistStore> distStoreByWindow;
+    private final long windowLength;
+    private final long ssLength;
+    private final int ssSize;
+
+    private final Map<Long, WindowDistStore<T>> distStoreByWindow;
 
     public DistStoreManager(
-            final long historySize) {
-        this.historySize = historySize;
+            final long windowLength,
+            final long ssLength,
+            final int ssSize) {
+        this.windowLength = windowLength;
+        this.ssLength = ssLength;
+        this.ssSize = ssSize;
 
         this.distStoreByWindow = new HashMap<>();
     }
 
-    public WindowDistStore createWindowDistStore(long windowIndex) {
-        WindowDistStore windowStore = new WindowDistStore(windowIndex);
+    public WindowDistStore<T> createWindowDistStore(long windowIndex) {
+        WindowDistStore<T> windowStore = new WindowDistStore<>(windowIndex, ssSize);
         distStoreByWindow.put(windowIndex, windowStore);
-
-        // Remove the window size of windowIndex - historySize
-        distStoreByWindow.remove(windowIndex - historySize);
         return windowStore;
     }
 
-    public pullHistory() {
-
+    public boolean removeWindowDistStore(long windowIndex) {
+        return distStoreByWindow.remove(windowIndex) != null;
     }
 }

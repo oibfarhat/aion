@@ -1,52 +1,58 @@
 package org.apache.flink.streaming.api.operators.watslack;
 
+import org.apache.flink.streaming.api.operators.watslack.diststore.GenDelaySSStore;
+import org.apache.flink.streaming.api.operators.watslack.diststore.NetDelaySSStore;
 import org.apache.flink.streaming.api.operators.watslack.diststore.WindowDistStore;
-import org.apache.flink.streaming.api.operators.watslack.sampling.SamplingSlackAlg;
+import org.apache.flink.streaming.api.operators.watslack.estimators.SSSizeEstimator;
+import org.apache.flink.streaming.api.operators.watslack.sampling.AbstractSSlackAlg;
 
 public class WindowSSlack {
+
+    private static final int MAX_NET_DELAY = 1000; // We can tolerate up to 1s max delay.
 
     /* Identifiers for WindowSS */
     private final long windowIndex;
     private final WindowSSlackManager sSlackManager;
-    private final SamplingSlackAlg samplingSlackAlg;
-    private final long windowSize;
-    private final long ssSize;
-
+    private final AbstractSSlackAlg samplingSlackAlg;
+    private final long windowLength;
+    private final long ssLength;
+    /* Stores */
+    private WindowDistStore<NetDelaySSStore> netDelayStore;
+    private WindowDistStore<GenDelaySSStore> genDelayStore;
     /* Estimators */
-    private WindowDistStore netDelayStore;
-    private WindowDistStore genDelayStore;
-//    private final SSSizeEstimator ssSizeEstimator;
-//    private final SSSampleSizeEstimator ssSampleSizeEstimator;
-
-    /* Book-keeping data structures . */
+    private SSSizeEstimator[] sssEstimator;
+    /*
+     * Book-keeping data structures.
+     * TODO(oibfarhat): I dont feel this is the right place for these data structures.
+     */
     private final long[] sampledEvents;
     private final long[] shedEvents;
-    private final boolean[] watermarkEmitted;
-
 
     WindowSSlack(
             /* Identifiers */
             final long windowIndex,
             final WindowSSlackManager sSlackManager,
-            final SamplingSlackAlg samplingSlackAlg,
-            final long windowSize,
-            final long ssSize,
+            final AbstractSSlackAlg samplingSlackAlg,
+            final long windowLength,
+            final long ssLength,
+            /* Stores */
+            final WindowDistStore<NetDelaySSStore> netDelayStore,
+            final WindowDistStore<GenDelaySSStore> genDelayStore,
             /* Estimators */
-            final WindowDistStore netDelayStore,
-            final WindowDistStore genDelayStore) {
+            final SSSizeEstimator sssEstimator) {
         this.windowIndex = windowIndex;
         this.sSlackManager = sSlackManager;
         this.samplingSlackAlg = samplingSlackAlg;
-        this.windowSize = windowSize;
-        this.ssSize = ssSize;
+        this.windowLength = windowLength;
+        this.ssLength = ssLength;
 
         this.netDelayStore = netDelayStore;
         this.genDelayStore = genDelayStore;
+        this.sssEstimator = sssEstimator;
 
-        int numOfSS = (int) Math.ceil(windowSize / (ssSize * 1.0));
-        sampledEvents = new long[numOfSS];
-        shedEvents = new long[numOfSS];
-//        targetSamplingRate = new long[numOfSS];
+        int ssSize = (int) Math.ceil(windowLength / (ssLength * 1.0));
+        sampledEvents = new long[ssSize];
+        shedEvents = new long[ssSize];
     }
 
     /*
@@ -54,7 +60,7 @@ public class WindowSSlack {
      */
     private int getSSLocalIndex(long eventTime) {
         assert sSlackManager.getWindowIndex(eventTime) == windowIndex;
-        return (int) ((windowIndex * windowSize) % ssSize);
+        return (int) ((windowIndex * windowLength) % ssLength);
     }
 
     /*
@@ -64,7 +70,14 @@ public class WindowSSlack {
      */
     public boolean sample(long eventTime) {
         int localSSIndex = getSSLocalIndex(eventTime);
-        netDelayStore.addEvent(localSSIndex, eventTime);
+        long delay = sSlackManager.getProcessingTimeService().getCurrentProcessingTime() - eventTime;
+
+        // In such cases, we do not bookeep such delays.
+        if (delay > MAX_NET_DELAY) {
+            return false;
+        }
+
+        netDelayStore.addEvent(localSSIndex, delay);
         genDelayStore.addEvent(localSSIndex, eventTime);
 
         if (samplingSlackAlg.sample()) {
@@ -79,16 +92,4 @@ public class WindowSSlack {
     public long getWindowIndex() {
         return windowIndex;
     }
-
-    public void addEvent(long eventTime) {
-        int localSSIndex = getSSLocalIndex(eventTime);
-        sampledEvents[localSSIndex]++;
-    }
-
-    public void discardEvent(long eventTime) {
-        int localSSIndex = getSSLocalIndex(eventTime);
-        shedEvents[localSSIndex]++;
-    }
-
-
 }

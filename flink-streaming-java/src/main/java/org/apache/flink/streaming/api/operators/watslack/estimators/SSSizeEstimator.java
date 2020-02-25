@@ -1,4 +1,7 @@
-package org.apache.flink.streaming.api.operators.watslack.garbage;
+package org.apache.flink.streaming.api.operators.watslack.estimators;
+
+import org.apache.flink.streaming.api.operators.watslack.garbage.InterEventGenDelayDist;
+import org.apache.flink.streaming.api.operators.watslack.garbage.NetworkDelayStore;
 
 import java.util.HashMap;
 import java.util.Map;

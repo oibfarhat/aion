@@ -3,6 +3,8 @@ package org.apache.flink.streaming.api.operators.watslack;
 import org.apache.flink.metrics.Counter;
 import org.apache.flink.metrics.SimpleCounter;
 import org.apache.flink.streaming.api.operators.watslack.diststore.DistStoreManager;
+import org.apache.flink.streaming.api.operators.watslack.diststore.GenDelaySSStore;
+import org.apache.flink.streaming.api.operators.watslack.diststore.NetDelaySSStore;
 import org.apache.flink.streaming.api.operators.watslack.diststore.WindowDistStore;
 import org.apache.flink.streaming.runtime.tasks.ProcessingTimeService;
 
@@ -15,15 +17,17 @@ import java.util.Map;
  */
 public final class WindowSSlackManager {
 
-    private final ProcessingTimeService processingTimeService;
+    private static final int HISTORY_SIZE = 1024;
 
+    private final ProcessingTimeService processingTimeService;
     /* Logical division of windows */
-    private final long windowSize;
-    private final long ssSize;
+    private final long windowLength;
+    private final long ssLength;
+    private final int ssSize;
 
     /* Structures to maintain distributions & diststore. */
-    private final DistStoreManager netDelayStoreManager;
-    private final DistStoreManager interEventStoreManager;
+    private final DistStoreManager<NetDelaySSStore> netDelayStoreManager;
+    private final DistStoreManager<GenDelaySSStore> interEventStoreManager;
 
     private final Map<Long, WindowSSlack> windowSlacksMap;
 
@@ -31,15 +35,18 @@ public final class WindowSSlackManager {
     private final Counter windowsCounter;
 
     public WindowSSlackManager(
-            ProcessingTimeService processingTimeService,
-            long windowSize, long ssSize) {
+            final ProcessingTimeService processingTimeService,
+            final long windowLength,
+            final long ssLength,
+            final int ssSize) {
         this.processingTimeService = processingTimeService;
 
-        this.windowSize = windowSize;
+        this.windowLength = windowLength;
+        this.ssLength = ssLength;
         this.ssSize = ssSize;
 
-        this.netDelayStoreManager = new DistStoreManager(1024);
-        this.interEventStoreManager = new DistStoreManager(1024);
+        this.netDelayStoreManager = new DistStoreManager<>(HISTORY_SIZE, windowLength, ssLength, ssSize);
+        this.interEventStoreManager = new DistStoreManager<>(HISTORY_SIZE, windowLength, ssLength, ssSize);
 
         this.windowSlacksMap = new HashMap<>();
         this.windowsCounter = new SimpleCounter();
@@ -50,11 +57,17 @@ public final class WindowSSlackManager {
         WindowSSlack ws = windowSlacksMap.getOrDefault(windowIndex, null);
         // New window!
         if (ws == null) {
-            WindowDistStore netDist = netDelayStoreManager.createWindowDistStore(windowIndex);
-            WindowDistStore interEventDist = interEventStoreManager.createWindowDistStore(windowIndex);
+            WindowDistStore<NetDelaySSStore> netDist = netDelayStoreManager.createWindowDistStore(windowIndex);
+            WindowDistStore<GenDelaySSStore> interEventDist = interEventStoreManager.createWindowDistStore(windowIndex);
 
             ws = new WindowSSlack(
-                    windowIndex, this, null, windowSize, ssSize, netDist, interEventDist, );
+                    windowIndex,
+                    this,
+                    null,
+                    windowLength,
+                    ssLength,
+                    netDist,
+                    interEventDist);
             windowSlacksMap.put(windowIndex, ws);
 
             windowsCounter.inc();
@@ -63,7 +76,7 @@ public final class WindowSSlackManager {
     }
 
     final long getWindowIndex(long eventTime) {
-        return (long) Math.ceil(eventTime / (windowSize * 1.0));
+        return (long) Math.ceil(eventTime / (windowLength * 1.0));
     }
 
     final ProcessingTimeService getProcessingTimeService() {
