@@ -430,14 +430,14 @@ public abstract class StreamTransformation<T> {
 
 	/**
 	 * Set the buffer timeout of this {@code StreamTransformation}. The timeout defines how long data
-	 * may linger in a partially full buffer before being sent over the network.
+	 * may linger in a partially full buffer before being sent over the diststore.
 	 *
 	 * <p>Lower timeouts lead to lower tail latencies, but may affect throughput.
 	 * For Flink 1.5+, timeouts of 1ms are feasible for jobs with high parallelism.
 	 *
 	 * <p>A value of -1 means that the default buffer timeout should be used. A value
 	 * of zero indicates that no buffering should happen, and all records/events should be
-	 * immediately sent through the network, without additional buffering.
+	 * immediately sent through the diststore, without additional buffering.
 	 */
 	public void setBufferTimeout(long bufferTimeout) {
 		checkArgument(bufferTimeout >= -1);

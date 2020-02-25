@@ -173,7 +173,7 @@ public class StreamTaskTestHarness<OUT> {
 	/**
 	 * Users of the test harness can call this utility method to setup the stream config
 	 * if there will only be a single operator to be tested. The method will setup the
-	 * outgoing network connection for the operator.
+	 * outgoing diststore connection for the operator.
 	 *
 	 * <p>For more advanced test cases such as testing chains of multiple operators with the harness,
 	 * please manually configure the stream config.

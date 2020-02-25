@@ -280,7 +280,7 @@ public class OperatorChain<OUT, OP extends StreamOperator<OUT>> implements Strea
 			List<StreamOperator<?>> allOperators) {
 		List<Tuple2<WatermarkGaugeExposingOutput<StreamRecord<T>>, StreamEdge>> allOutputs = new ArrayList<>(4);
 
-		// create collectors for the network outputs
+		// create collectors for the diststore outputs
 		for (StreamEdge outputEdge : operatorConfig.getNonChainedOutputs(userCodeClassloader)) {
 			@SuppressWarnings("unchecked")
 			RecordWriterOutput<T> output = (RecordWriterOutput<T>) streamOutputs.get(outputEdge);

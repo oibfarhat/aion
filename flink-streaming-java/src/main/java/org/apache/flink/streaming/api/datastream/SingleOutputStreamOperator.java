@@ -228,14 +228,14 @@ public class SingleOutputStreamOperator<T> extends DataStream<T> {
 	/**
 	 * Sets the buffering timeout for data produced by this operation.
 	 * The timeout defines how long data may linger in a partially full buffer
-	 * before being sent over the network.
+	 * before being sent over the diststore.
 	 *
 	 * <p>Lower timeouts lead to lower tail latencies, but may affect throughput.
 	 * Timeouts of 1 ms still sustain high throughput, even for jobs with high parallelism.
 	 *
 	 * <p>A value of '-1' means that the default buffer timeout should be used. A value
 	 * of '0' indicates that no buffering should happen, and all records/events should be
-	 * immediately sent through the network, without additional buffering.
+	 * immediately sent through the diststore, without additional buffering.
 	 *
 	 * @param timeoutMillis
 	 *            The maximum time between two output flushes.

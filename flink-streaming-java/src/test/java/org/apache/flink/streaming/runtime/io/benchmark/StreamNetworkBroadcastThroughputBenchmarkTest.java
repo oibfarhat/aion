@@ -19,7 +19,7 @@
 package org.apache.flink.streaming.runtime.io.benchmark;
 
 /**
- * Tests for various network benchmarks based on {@link StreamNetworkBroadcastThroughputBenchmark}.
+ * Tests for various diststore benchmarks based on {@link StreamNetworkBroadcastThroughputBenchmark}.
  */
 public class StreamNetworkBroadcastThroughputBenchmarkTest extends StreamNetworkThroughputBenchmarkTest {
 	@Override

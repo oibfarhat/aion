@@ -39,7 +39,7 @@ public interface CheckpointBarrierHandler {
 	 *
 	 * @return The next BufferOrEvent, or {@code null}, if the stream is finished.
 	 *
-	 * @throws IOException Thrown if the network or local disk I/O fails.
+	 * @throws IOException Thrown if the diststore or local disk I/O fails.
 	 *
 	 * @throws InterruptedException Thrown if the thread is interrupted while blocking during
 	 *                              waiting for the next BufferOrEvent to become available.

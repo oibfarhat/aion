@@ -1,4 +1,4 @@
-package org.apache.flink.streaming.api.operators.watslack;
+package org.apache.flink.streaming.api.operators.watslack.garbage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,12 +8,12 @@ import java.util.LinkedList;
 import java.util.Map;
 
 /**
- * This class is used to store the mean and standard deviation for each network delay substream (ss).
+ * This class is used to store the mean and standard deviation for each diststore delay substream (ss).
  * TODO(oibfarhat): Embed statistics.
  */
-public class NetworkDelayDist {
+public class NetworkDelayStore {
 
-    protected static final Logger LOG = LoggerFactory.getLogger(NetworkDelayDist.class);
+    protected static final Logger LOG = LoggerFactory.getLogger(NetworkDelayStore.class);
 
     final class SSDelayProp {
         private final long ssIndex;
@@ -57,7 +57,7 @@ public class NetworkDelayDist {
         }
     }
 
-    /* Size of ss info to maintain. */
+    /* History in terms of windows size. */
     private final int historySize;
     /* Data structures to preserve historical information. */
     private final LinkedList<SSDelayProp> historicalSSList;
@@ -66,7 +66,9 @@ public class NetworkDelayDist {
     /* Last finalized ss. */
     private long ssWatermark;
 
-    public NetworkDelayDist(int historySize) {
+    /* Data Structures */
+    private final Map<>
+    public NetworkDelayStore(int historySize) {
         this.historySize = historySize;
         /* Data Structures */
         this.historicalSSList = new LinkedList<>();
@@ -131,5 +133,7 @@ public class NetworkDelayDist {
         }
         return new SSDelayProp(ssIndex, mean / count, sd / count, count);
     }
+
+
 }
 

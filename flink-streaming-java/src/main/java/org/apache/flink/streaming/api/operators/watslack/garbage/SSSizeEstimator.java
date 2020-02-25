@@ -1,11 +1,11 @@
-package org.apache.flink.streaming.api.operators.watslack;
+package org.apache.flink.streaming.api.operators.watslack.garbage;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class SSSizeEstimator {
 
-    private final NetworkDelayDist delayDist;
+    private final NetworkDelayStore delayDist;
     private final InterEventGenDelayDist genDist;
     private final long watermarkFrequency;
 
@@ -13,7 +13,7 @@ public class SSSizeEstimator {
     private Map<Long, Long> cachedSubstreams;
 
     public SSSizeEstimator(
-            final NetworkDelayDist delayDist, final InterEventGenDelayDist genDist, final long watermarkFrequency) {
+            final NetworkDelayStore delayDist, final InterEventGenDelayDist genDist, final long watermarkFrequency) {
         this.delayDist = delayDist;
         this.genDist = genDist;
         this.watermarkFrequency = watermarkFrequency;
@@ -26,7 +26,7 @@ public class SSSizeEstimator {
         if (cachedSubstreams.containsKey(substreamIndex)) {
             return cachedSubstreams.get(substreamIndex);
         }
-        NetworkDelayDist.SSDelayProp delayProps = delayDist.estimate(substreamIndex);
+        NetworkDelayStore.SSDelayProp delayProps = delayDist.estimate(substreamIndex);
         InterEventGenDelayDist.SSGenProp genProps = genDist.estimate(substreamIndex);
         long n = (long) Math.ceil((delayProps.mean + this.watermarkFrequency) * genProps.mean);
 

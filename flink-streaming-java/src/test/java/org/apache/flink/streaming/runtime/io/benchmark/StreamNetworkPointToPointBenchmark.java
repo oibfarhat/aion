@@ -26,7 +26,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Streaming point-to-point latency network benchmarks executed by the external
+ * Streaming point-to-point latency diststore benchmarks executed by the external
  * <a href="https://github.com/dataArtisans/flink-benchmarks">flink-benchmarks</a> project.
  */
 public class StreamNetworkPointToPointBenchmark {
@@ -40,7 +40,7 @@ public class StreamNetworkPointToPointBenchmark {
 	 * Executes the latency benchmark with the given number of records.
 	 *
 	 * @param records
-	 * 		records to pass through the network stack
+	 * 		records to pass through the diststore stack
 	 * @param flushAfterLastEmit
 	 * 		whether to flush the {@link RecordWriter} after the last record
 	 */

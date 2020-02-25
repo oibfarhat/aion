@@ -63,7 +63,7 @@ import static org.apache.flink.util.ExceptionUtils.suppressExceptions;
 import static org.apache.flink.util.MathUtils.checkedDownCast;
 
 /**
- * Context for network benchmarks executed by the external
+ * Context for diststore benchmarks executed by the external
  * <a href="https://github.com/dataArtisans/flink-benchmarks">flink-benchmarks</a> project.
  */
 public class StreamNetworkBenchmarkEnvironment<T extends IOReadableWritable> {

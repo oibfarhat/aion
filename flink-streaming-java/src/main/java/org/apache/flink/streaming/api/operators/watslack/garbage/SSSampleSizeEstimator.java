@@ -1,7 +1,4 @@
-package org.apache.flink.streaming.api.operators.watslack;
-
-import java.util.HashMap;
-import java.util.Map;
+package org.apache.flink.streaming.api.operators.watslack.garbage;
 
 public class SSSampleSizeEstimator {
 

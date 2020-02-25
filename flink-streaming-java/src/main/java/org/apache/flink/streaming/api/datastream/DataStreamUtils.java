@@ -65,7 +65,7 @@ public final class DataStreamUtils {
 				clientAddress = ConnectionUtils.findConnectingAddress(new InetSocketAddress(host, port), 2000, 400);
 			}
 			catch (Exception e) {
-				throw new IOException("Could not determine an suitable network address to " +
+				throw new IOException("Could not determine an suitable diststore address to " +
 						"receive back data from the streaming program.", e);
 			}
 		} else if (env instanceof LocalStreamEnvironment) {

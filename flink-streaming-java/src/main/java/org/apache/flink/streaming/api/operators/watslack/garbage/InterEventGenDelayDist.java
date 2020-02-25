@@ -1,4 +1,4 @@
-package org.apache.flink.streaming.api.operators.watslack;
+package org.apache.flink.streaming.api.operators.watslack.garbage;
 
 import java.util.HashMap;
 import java.util.LinkedList;

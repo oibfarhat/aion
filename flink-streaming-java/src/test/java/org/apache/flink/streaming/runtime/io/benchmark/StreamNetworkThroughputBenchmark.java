@@ -40,7 +40,7 @@ public class StreamNetworkThroughputBenchmark {
 	/**
 	 * Executes the throughput benchmark with the given number of records.
 	 *
-	 * @param records to pass through the network stack
+	 * @param records to pass through the diststore stack
 	 */
 	public void executeBenchmark(long records, long timeout) throws Exception {
 		final LongValue value = new LongValue();

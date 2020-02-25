@@ -27,7 +27,7 @@ import org.junit.rules.ExpectedException;
 import java.io.IOException;
 
 /**
- * Tests for various network benchmarks based on {@link StreamNetworkThroughputBenchmark}.
+ * Tests for various diststore benchmarks based on {@link StreamNetworkThroughputBenchmark}.
  */
 public class StreamNetworkThroughputBenchmarkTest {
 	@Rule
@@ -80,7 +80,7 @@ public class StreamNetworkThroughputBenchmarkTest {
 		int channels = 2;
 
 		expectedException.expect(IOException.class);
-		expectedException.expectMessage("Insufficient number of network buffers");
+		expectedException.expectMessage("Insufficient number of diststore buffers");
 
 		env.setUp(writers, channels, 100, false, writers * channels - 1, writers * channels * TaskManagerOptions.NETWORK_BUFFERS_PER_CHANNEL.defaultValue());
 	}
@@ -92,7 +92,7 @@ public class StreamNetworkThroughputBenchmarkTest {
 		int channels = 2;
 
 		expectedException.expect(IOException.class);
-		expectedException.expectMessage("Insufficient number of network buffers");
+		expectedException.expectMessage("Insufficient number of diststore buffers");
 
 		env.setUp(writers, channels, 100, false, writers * channels, writers * channels * TaskManagerOptions.NETWORK_BUFFERS_PER_CHANNEL.defaultValue() - 1);
 	}
