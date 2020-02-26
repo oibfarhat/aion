@@ -9,6 +9,7 @@ public class GenDelaySSStore implements SSDistStore {
 
     protected static final Logger LOG = LoggerFactory.getLogger(GenDelaySSStore.class);
 
+    private final long windowIndex;
     private final long ssIndex;
     private final PriorityQueue<Long> eventsQueue;
     private double mean;
@@ -16,7 +17,8 @@ public class GenDelaySSStore implements SSDistStore {
     private long count;
     private boolean isPurged;
 
-    public GenDelaySSStore(final long ssIndex) {
+    GenDelaySSStore(final long windowIndex, final long ssIndex) {
+        this.windowIndex = windowIndex;
         this.ssIndex = ssIndex;
         this.mean = 0;
         this.sd = 0;
@@ -67,6 +69,7 @@ public class GenDelaySSStore implements SSDistStore {
             this.mean /= count;
             this.sd = (this.sd / this.count) - (this.mean * this.mean);
         }
+        LOG.info("Purging SS {}.{}: (mu={}, sd={}, count={})", windowIndex, ssIndex, mean, sd, count);
         this.eventsQueue.clear();
     }
 }

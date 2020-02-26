@@ -7,13 +7,15 @@ public class NetDelaySSStore implements SSDistStore {
 
     protected static final Logger LOG = LoggerFactory.getLogger(NetDelaySSStore.class);
 
+    private final long windowIndex;
     private final long ssIndex;
     private double mean;
     private  double sd;
     private long count;
     private boolean isPurged;
 
-    NetDelaySSStore(long ssIndex) {
+    NetDelaySSStore(final long windowIndex, final long ssIndex) {
+        this.windowIndex = windowIndex;
         this.ssIndex = ssIndex;
         this.mean = 0;
         this.sd = 0;
@@ -48,6 +50,7 @@ public class NetDelaySSStore implements SSDistStore {
             this.mean /= count;
             this.sd = (this.sd / this.count) - (this.mean * this.mean);
         }
+        LOG.info("Purging SS {}.{}: (mu={}, sd={}, count={})", windowIndex, ssIndex, mean, sd, count);
         this.isPurged = true;
     }
 }

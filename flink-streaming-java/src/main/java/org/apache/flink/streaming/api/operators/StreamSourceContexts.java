@@ -21,6 +21,7 @@ import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.streaming.api.operators.watslack.WindowSSlack;
 import org.apache.flink.streaming.api.operators.watslack.WindowSSlackManager;
+import org.apache.flink.streaming.api.operators.watslack.sampling.NaiveSSlackAlg;
 import org.apache.flink.streaming.api.watermark.Watermark;
 import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;
 import org.apache.flink.streaming.runtime.streamstatus.StreamStatus;
@@ -40,6 +41,9 @@ import java.util.concurrent.ScheduledFuture;
 public class StreamSourceContexts {
 
 	protected static final Logger LOG = LoggerFactory.getLogger(StreamSourceContexts.class);
+
+	private static final long WINDOW_LENGTH = 3000;
+	private static final long SS_LENGTH = 1000;
 
 	/**
 	 * Depending on the {@link TimeCharacteristic}, this method will return the adequate
@@ -65,7 +69,11 @@ public class StreamSourceContexts {
 				ctx = new WatSlackWatermarkContext<>(
 						output,
 						processingTimeService,
-						new WindowSSlackManager(processingTimeService, 3000, 100),
+						new WindowSSlackManager(
+								processingTimeService,
+                                WINDOW_LENGTH,
+								SS_LENGTH,
+								(int) Math.ceil(WINDOW_LENGTH / (SS_LENGTH * 1.0))),
 						checkpointLock,
 						streamStatusMaintainer,
 						idleTimeout);
@@ -292,15 +300,6 @@ public class StreamSourceContexts {
 
 		private final WindowSSlackManager windowSSlackManager;
 
-		/* WatSlack Specific Data Structures */
-		private Set<Long> observedSSSet;
-		private Set<Long> observedWindows;
-		private Map<Long, Long> eventsProcPerSSMap;
-		private Map<Long, Long> targetTheta;
-
-		/* Utils */
-		private final Random random;
-
 		private WatSlackWatermarkContext(
 				final Output<StreamRecord<T>> output,
 				final ProcessingTimeService timeService,
@@ -313,12 +312,6 @@ public class StreamSourceContexts {
 			this.output = Preconditions.checkNotNull(output, "The output cannot be null.");
 			this.reuse = new StreamRecord<>(null);
 			this.windowSSlackManager = windowSSlackManager;
-
-			/* Watermark specific Data Structures */
-			this.observedSSSet = new HashSet<>();
-			this.eventsProcPerSSMap = new HashMap<>();
-
-			this.random = new Random();
 		}
 
 		@Override
@@ -328,59 +321,19 @@ public class StreamSourceContexts {
 
 		@Override
 		protected void processAndCollectWithTimestamp(T element, long timestamp) {
-			/*
-			 * The algorithm is divided into 3 steps:
-			 * 1) Collect timestamp
-			 * 2) Sampling algorithm
-			 * 3) Watermark Emission
-			 */
 			WindowSSlack window = windowSSlackManager.getWindowSlack(timestamp);
 			if (window.sample(timestamp)) {
 				output.collect(reuse.replace(element, timestamp));
 			}
 
-			// Interface not disclosed here yet.
-			long watTime = window.punctuateSS(timestamp);
-//			if  {
-//				output.emitWatermark
-//			}
-//			window.addEvent(timestamp);
-//			long ssIndex = (long) Math.ceil(timestamp / (watermarkFrequency * 1.0));
-//			if (!observedSSSet.contains(ssIndex)) {
-//				observedSSSet.add(ssIndex);
-//				eventsProcPerSSMap.put(ssIndex, 0L);
-//			}
-//
-//			// 1) Collect event timestamp.
-//			streamNetDelay.add(ssIndex, this.timeService.getCurrentProcessingTime() - timestamp);
-//			streamGenDelay.add(ssIndex, timestamp);
-//
-//			// 2) Sampling algorithm.
-//			long processedPerSS = eventsProcPerSSMap.get(ssIndex);
-//			// Let us do it with rate = 0.9 for now.
-//			if (random.nextDouble() <= 0.9) {
-//				output.collect(reuse.replace(element, timestamp));
-//				eventsProcPerSSMap.put(ssIndex, ++processedPerSS);
-//			} else {
-//				LOG.info("Dropped a tuple %ld that belong to Window %ld", timestamp);
-//			}
-//
-//			/*
-//			 * 3) Watermark Emission
-//			 *
-//			 * Watermarks are emitted in one of two cases:
-//			 * 	a) θ events were collected; or
-//			 * 	b) time expired.
-//			 */
-//
-//			// Check a)
-//			long targetSampleSize = ssSampleSizeEstimator.estimate(ssIndex);
-//			if (processedPerSS >= targetSampleSize) {
-//				// Substream is done!
-//				streamNetDelay.finalize(ssIndex);
-//				output.emitWatermark(new Watermark(ssIndex * (watermarkFrequency + 1)));
-//				LOG.info("Emitted a watermark with %ld", ssIndex * (watermarkFrequency + 1));
-//			}
+			long watTarget = window.emitWatermark(timestamp);
+			if (watTarget != -1) {
+				Watermark watermark = new Watermark(watTarget);
+				output.emitWatermark(new Watermark(watTarget));
+				windowSSlackManager.setLastEmittedWatermark(watTarget);
+				LOG.info("Emitted WT = {}", watermark);
+			}
+
 		}
 
 		@Override
