@@ -2,7 +2,6 @@ package org.apache.flink.streaming.api.operators.watslack;
 
 import org.apache.flink.streaming.api.operators.watslack.diststore.WindowDistStore;
 import org.apache.flink.streaming.api.operators.watslack.estimators.SSSizeEstimator;
-import org.apache.flink.streaming.api.operators.watslack.sampling.AbstractSSlackAlg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +58,7 @@ public class WindowSSlack {
      */
     private int getSSLocalIndex(long eventTime) {
         assert sSlackManager.getWindowIndex(eventTime) == windowIndex;
-        return (int) ((windowIndex * windowLength) % ssLength);
+        return (int) ((eventTime - (windowIndex * windowLength)) / ssLength);
     }
 
     /*
@@ -111,6 +110,11 @@ public class WindowSSlack {
                 double samplingRatio = sampledEvents[ssLocalIndex] / (observedEvents * 1.0);
                 sSlackManager
                         .getsSlackAlg().updateAfterPurging(windowIndex, ssLocalIndex, observedEvents, samplingRatio);
+
+                LOG.info(
+                        "Purging {}.{}: [sampled: {}, discarded: {}, total: {}, sampling rate: {}",
+                        windowIndex, ssLocalIndex, sampledEvents[ssLocalIndex], shedEvents[ssLocalIndex],
+                        observedEvents, samplingRatio);
             }
             succPurged |= newlyPurged;
         }

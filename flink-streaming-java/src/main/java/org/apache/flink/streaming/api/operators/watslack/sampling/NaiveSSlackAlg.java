@@ -14,10 +14,10 @@ public class NaiveSSlackAlg extends AbstractSSlackAlg {
     }
 
     @Override
-    protected void initiatePlan(long windowIndex) {
+    public void initiatePlan(long windowIndex) {
         SamplingPlan samplingPlan = new SamplingPlan(windowIndex, ssSize);
         for (int i = 0; i < ssSize; i++) {
-            samplingPlan.updatePlanFacts(i, 5, 0.2);
+            samplingPlan.updatePlanFacts(i, 450, 0.5);
         }
         samplingPlanMap.put(windowIndex, samplingPlan);
     }

@@ -43,7 +43,7 @@ public class StreamSourceContexts {
 	protected static final Logger LOG = LoggerFactory.getLogger(StreamSourceContexts.class);
 
 	private static final long WINDOW_LENGTH = 3000;
-	private static final long SS_LENGTH = 1000;
+	private static final long SS_LENGTH = 300;
 
 	/**
 	 * Depending on the {@link TimeCharacteristic}, this method will return the adequate
@@ -300,6 +300,9 @@ public class StreamSourceContexts {
 
 		private final WindowSSlackManager windowSSlackManager;
 
+		private final static int MAX_TRIALS = 50;
+		private int trials = 0;
+
 		private WatSlackWatermarkContext(
 				final Output<StreamRecord<T>> output,
 				final ProcessingTimeService timeService,
@@ -326,12 +329,16 @@ public class StreamSourceContexts {
 				output.collect(reuse.replace(element, timestamp));
 			}
 
-			long watTarget = window.emitWatermark(timestamp);
-			if (watTarget != -1) {
-				Watermark watermark = new Watermark(watTarget);
-				output.emitWatermark(new Watermark(watTarget));
-				windowSSlackManager.setLastEmittedWatermark(watTarget);
-				LOG.info("Emitted WT = {}", watermark);
+			trials++;
+			if (trials == MAX_TRIALS) {
+				long watTarget = window.emitWatermark(timestamp);
+				if (watTarget != -1) {
+					Watermark watermark = new Watermark(watTarget);
+					output.emitWatermark(new Watermark(watTarget));
+					windowSSlackManager.setLastEmittedWatermark(watTarget);
+					LOG.info("Emitted WT = {}", watermark);
+				}
+				trials = 0;
 			}
 
 		}
