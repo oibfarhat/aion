@@ -3,7 +3,7 @@ package org.apache.flink.streaming.api.operators.watslack.diststore;
 /**
  * This interface is used to provide an API to maintain the recorded values.
  */
-public interface SSDistStore {
+public interface SSDistStore extends Comparable<SSDistStore> {
 
     long getWindowIndex();
 

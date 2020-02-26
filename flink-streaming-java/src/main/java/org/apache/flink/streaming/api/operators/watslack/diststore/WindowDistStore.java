@@ -39,4 +39,8 @@ public class WindowDistStore {
         }
         return false;
     }
+
+    public boolean isPurged(int localSSIndex) {
+        return ssStores[localSSIndex].isPurged();
+    }
 }

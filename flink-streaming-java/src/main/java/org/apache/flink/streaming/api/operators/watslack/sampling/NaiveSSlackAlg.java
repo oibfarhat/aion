@@ -6,7 +6,7 @@ import org.apache.flink.streaming.api.operators.watslack.estimators.WindowSizeEs
 
 public class NaiveSSlackAlg extends AbstractSSlackAlg {
 
-    private static final double TARGET_SR = 0.7;
+    private static final double TARGET_SR = 0.8;
 
     public NaiveSSlackAlg(
             final WindowSSlackManager sSlackManager,
@@ -15,12 +15,9 @@ public class NaiveSSlackAlg extends AbstractSSlackAlg {
     }
 
     @Override
-    public void initiatePlan(WindowSSlack windowSSlack) {
-        SamplingPlan samplingPlan =
-                new SamplingPlan(windowSSlack, windowSSlackManager.getSSSize());
-        samplingPlanMap.put(windowSSlack, samplingPlan);
-
+    public void initiatePlan(WindowSSlack windowSSlack, SamplingPlan samplingPlan) {
         long ssEventsNum = srEstimator.getEventsNumPerSS();
+        LOG.info("initiatePlan: Anticipating {} events per SS", ssEventsNum);
         for (int i = 0; i < windowSSlackManager.getSSSize(); i++) {
             samplingPlan.updatePlan(i, ssEventsNum, TARGET_SR);
         }
@@ -30,7 +27,7 @@ public class NaiveSSlackAlg extends AbstractSSlackAlg {
     protected void updatePlan(WindowSSlack windowSSlack) {
         SamplingPlan plan = samplingPlanMap.get(windowSSlack);
         long ssEventsNum = srEstimator.getEventsNumPerSS();
-
+        LOG.info("updatePlan: Anticipating {} events per SS", ssEventsNum);
         for (int i = 0; i < windowSSlackManager.getSSSize(); i++) {
             if (!plan.isSSPurged(i))
                 plan.updatePlan(i, ssEventsNum, TARGET_SR);

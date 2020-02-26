@@ -1,5 +1,8 @@
 package org.apache.flink.streaming.api.operators.watslack.diststore;
 
+import org.apache.flink.streaming.api.operators.watslack.WindowSSlack;
+import org.apache.flink.streaming.api.operators.watslack.WindowSSlackManager;
+
 import java.util.*;
 
 public class DistStoreManager {
@@ -9,32 +12,25 @@ public class DistStoreManager {
         GEN_DELAY
     }
 
-    private final long windowLength;
-    private final long ssLength;
-    private final int ssSize;
-
+    private final WindowSSlackManager sSlackManager;
     private final DistStoreType storeType;
-    private final Map<Long, WindowDistStore> distStoreByWindow;
+    private final Map<WindowSSlack, WindowDistStore> distStoreByWindow;
 
     private final Set<SSDistStore> purgedSSSet;
 
     public DistStoreManager(
-            final long windowLength,
-            final long ssLength,
-            final int ssSize,
+            final WindowSSlackManager sSlackManager,
             final DistStoreType storeType) {
-        this.windowLength = windowLength;
-        this.ssLength = ssLength;
-        this.ssSize = ssSize;
+        this.sSlackManager = sSlackManager;
         this.storeType = storeType;
 
         this.distStoreByWindow = new HashMap<>();
         this.purgedSSSet = new TreeSet<>();
     }
 
-    public WindowDistStore createWindowDistStore(long windowIndex) {
-        WindowDistStore windowStore = new WindowDistStore(windowIndex, this, ssSize);
-        distStoreByWindow.put(windowIndex, windowStore);
+    public WindowDistStore createWindowDistStore(WindowSSlack windowSSlack) {
+        WindowDistStore windowStore = new WindowDistStore(windowSSlack, this, sSlackManager.getSSSize());
+        distStoreByWindow.put(windowSSlack, windowStore);
         return windowStore;
     }
 
@@ -45,12 +41,12 @@ public class DistStoreManager {
         return purgedSSSet;
     }
 
-    public boolean removeWindowDistStore(long windowIndex) {
-        WindowDistStore store = distStoreByWindow.remove(windowIndex);
+    public boolean removeWindowDistStore(WindowSSlack windowSSlack) {
+        WindowDistStore store = distStoreByWindow.remove(windowSSlack);
         if (store == null) {
             return false;
         }
-        purgedSSSet.removeIf(ssStore -> ssStore.getWindowIndex() == windowIndex);
+        purgedSSSet.removeIf(ssStore -> ssStore.getWindowIndex() == windowSSlack.getWindowIndex());
         return true;
     }
 

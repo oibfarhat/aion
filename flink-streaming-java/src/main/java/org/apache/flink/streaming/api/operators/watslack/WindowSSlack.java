@@ -24,15 +24,12 @@ public class WindowSSlack {
     WindowSSlack(
             /* Identifiers */
             final WindowSSlackManager sSlackManager,
-            final long windowIndex,
-            /* Stores */
-            final WindowDistStore netDelayStore,
-            final WindowDistStore genDelayStore) {
+            final long windowIndex) {
         this.windowIndex = windowIndex;
         this.sSlackManager = sSlackManager;
 
-        this.netDelayStore = netDelayStore;
-        this.genDelayStore = genDelayStore;
+        this.netDelayStore = sSlackManager.getNetDelayStoreManager().createWindowDistStore(this);
+        this.genDelayStore = sSlackManager.getInterEventStoreManager().createWindowDistStore(this);
 
         this.sampledEvents = new long[sSlackManager.getSSSize()];
         this.shedEvents = new long[sSlackManager.getSSSize()];
@@ -90,17 +87,17 @@ public class WindowSSlack {
              time += sSlackManager.getSSLength()) {
 
             int localSSIndex = getSSLocalIndex(time);
-            boolean newlyPurged = netDelayStore.purgeSS(localSSIndex) || genDelayStore.purgeSS(localSSIndex);
+            boolean newlyPurged = netDelayStore.purgeSS(localSSIndex) && genDelayStore.purgeSS(localSSIndex);
 
             if (newlyPurged) {
                 long observedEvents = getObservedEvents(localSSIndex);
-                double samplingRatio = getSampledEvents(localSSIndex);
+                double samplingRatio = getSamplingRate(localSSIndex);
                 sSlackManager
                         .getsSlackAlg()
                         .updateAfterPurging(this, localSSIndex);
 
                 LOG.info(
-                        "Purging {}.{}: [sampled: {}, discarded: {}, total: {}, sampling rate: {}",
+                        "Purging {}.{}: [sampled: {}, discarded: {}, total: {}, sr: {}",
                         windowIndex, localSSIndex, getSampledEvents(localSSIndex), shedEvents[localSSIndex],
                         observedEvents, samplingRatio);
             }
@@ -114,6 +111,10 @@ public class WindowSSlack {
     }
 
     /* Manipulation functions for book-keept data */
+    public boolean isPurged(int localSSIndex) {
+        return netDelayStore.isPurged(localSSIndex);
+    }
+
     private long getObservedEvents() {
         long sum = 0;
         for (int i = 0; i < sSlackManager.getSSSize(); i++) {

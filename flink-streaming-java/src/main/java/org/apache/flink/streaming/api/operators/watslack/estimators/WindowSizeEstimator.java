@@ -3,7 +3,6 @@ package org.apache.flink.streaming.api.operators.watslack.estimators;
 import org.apache.flink.streaming.api.operators.watslack.WindowSSlackManager;
 import org.apache.flink.streaming.api.operators.watslack.diststore.DistStoreManager;
 import org.apache.flink.streaming.api.operators.watslack.diststore.SSDistStore;
-import org.apache.flink.streaming.api.operators.watslack.sampling.SamplingPlan;
 
 import java.util.Set;
 
@@ -34,9 +33,9 @@ public class WindowSizeEstimator {
 
         assert purgedGenDelay.size() == purgedNetDelay.size();
 
-        double averageNetMean = purgedNetDelay.stream().mapToDouble(SSDistStore::getMean).average().getAsDouble();
-        double averageGenMean = purgedGenDelay.stream().mapToDouble(SSDistStore::getMean).average().getAsDouble();
+        double averageNetDelay = purgedNetDelay.stream().mapToDouble(SSDistStore::getMean).average().getAsDouble();
+        double averageGenDelay = purgedGenDelay.stream().mapToDouble(SSDistStore::getMean).average().getAsDouble();
 
-        return (long) Math.ceil((averageNetMean + sSlackManager.getSSLength()) * averageGenMean);
+        return (long) Math.ceil(sSlackManager.getSSLength() * averageGenDelay);
     }
 }

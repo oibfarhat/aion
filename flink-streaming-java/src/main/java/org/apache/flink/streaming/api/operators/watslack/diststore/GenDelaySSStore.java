@@ -111,4 +111,13 @@ public class GenDelaySSStore implements SSDistStore {
         LOG.warn("Retrieving the count of a non-purged substream");
         return -1;
     }
+
+    @Override
+    public int compareTo(SSDistStore ssDistStore) {
+        if (this.windowDistStore.getWindowIndex() != ssDistStore.getWindowIndex()) {
+            return (int) (this.windowDistStore.getWindowIndex() - ssDistStore.getWindowIndex());
+        } else {
+            return (int) (this.getSSIndex() - ssDistStore.getSSIndex());
+        }
+    }
 }

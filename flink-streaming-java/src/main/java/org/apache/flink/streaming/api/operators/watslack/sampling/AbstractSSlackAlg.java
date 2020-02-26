@@ -38,9 +38,15 @@ public abstract class AbstractSSlackAlg {
         this.random = new Random();
     }
 
-    public abstract void initiatePlan(WindowSSlack windowSSlack);
+    public void initWindow(WindowSSlack windowSSlack) {
+        SamplingPlan samplingPlan =
+                new SamplingPlan(windowSSlack, windowSSlackManager.getSSSize());
+        samplingPlanMap.put(windowSSlack, samplingPlan);
 
-    protected abstract void updatePlan(WindowSSlack windowSSlack);
+        if (windowSSlackManager.isWarmedUp()) {
+            initiatePlan(windowSSlack, samplingPlan);
+        }
+    }
 
     public void updateAfterPurging(WindowSSlack windowSSlack, int localSSIndex) {
         SamplingPlan plan = samplingPlanMap.getOrDefault(windowSSlack, null);
@@ -51,6 +57,9 @@ public abstract class AbstractSSlackAlg {
 
         /* Purge the SS part of the plan. */
         plan.purgeSS(localSSIndex);
+        if (!windowSSlackManager.isWarmedUp()) {
+            return;
+        }
         /* Estimate the newest values. */
         updatePlan(windowSSlack);
     }
@@ -63,6 +72,9 @@ public abstract class AbstractSSlackAlg {
         // Watermark already emitted
         if (windowSSlackManager.getLastEmittedWatermark() >=
                 windowSSlackManager.getSSDeadline(windowSSlack.getWindowIndex(), localSSIndex)) {
+            if (windowSSlack.isPurged(localSSIndex)) {
+                LOG.warn("Attempting to add data to a purged window.");
+            }
             return false;
         }
         return random.nextDouble() <= samplingPlanMap.get(windowSSlack).getSamplingRate(localSSIndex);
@@ -84,4 +96,9 @@ public abstract class AbstractSSlackAlg {
         }
         return -1;
     }
+
+    protected abstract void initiatePlan(WindowSSlack windowSSlack, SamplingPlan samplingPlan);
+
+    protected abstract void updatePlan(WindowSSlack windowSSlack);
+
 }

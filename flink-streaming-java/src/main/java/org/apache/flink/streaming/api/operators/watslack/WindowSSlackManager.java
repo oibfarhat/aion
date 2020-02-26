@@ -59,11 +59,11 @@ public final class WindowSSlackManager {
         this.ssLength = ssLength;
         this.ssSize = ssSize;
 
-        this.netDelayStoreManager = new DistStoreManager(windowLength, ssLength, ssSize, NET_DELAY);
-        this.interEventStoreManager = new DistStoreManager(windowLength, ssLength, ssSize, GEN_DELAY);
+        this.netDelayStoreManager = new DistStoreManager(this, NET_DELAY);
+        this.interEventStoreManager = new DistStoreManager(this, GEN_DELAY);
 
         WindowSizeEstimator srEstimator =
-                new WindowSizeEstimator(netDelayStoreManager, interEventStoreManager, windowLength, ssLength);
+                new WindowSizeEstimator(this, netDelayStoreManager, interEventStoreManager);
         this.sSlackAlg = new NaiveSSlackAlg(this, srEstimator);
 
         this.windowSlacksMap = new HashMap<>();
@@ -113,21 +113,25 @@ public final class WindowSSlackManager {
         return sSlackAlg;
     }
 
+    DistStoreManager getNetDelayStoreManager() {
+        return netDelayStoreManager;
+    }
+
+    DistStoreManager getInterEventStoreManager() {
+        return interEventStoreManager;
+    }
+
     /* Map manipulation */
     public WindowSSlack getWindowSlack(long eventTime) {
         long windowIndex = getWindowIndex(eventTime);
         WindowSSlack ws = windowSlacksMap.getOrDefault(windowIndex, null);
         // New window!
         if (ws == null) {
-            WindowDistStore netDist = netDelayStoreManager.createWindowDistStore(windowIndex);
-            WindowDistStore interEventDist = interEventStoreManager.createWindowDistStore(windowIndex);
             ws = new WindowSSlack(
                     this,
-                    windowIndex,
-                    netDist,
-                    interEventDist);
+                    windowIndex);
             windowSlacksMap.put(windowIndex, ws);
-            sSlackAlg.initiatePlan(windowIndex);
+            sSlackAlg.initWindow(ws);
             // Remove from history
             removeWindowSSlack(windowIndex - HISTORY_SIZE);
             windowsCounter.inc();
@@ -173,7 +177,7 @@ public final class WindowSSlackManager {
                 long windowIndex = getWindowIndex(currTime);
 
                 // TODO(oibfarhat): Consider making this more efficient
-                for(long currIndex = windowIndex - 15; currIndex <= windowIndex; currIndex++) {
+                for (long currIndex = windowIndex - 15; currIndex <= windowIndex; currIndex++) {
                     WindowSSlack ws = windowSlacksMap.getOrDefault(windowIndex, null);
                     if (ws != null) {
                         if (ws.purgeSS(currTime) && !isWarmedUp) {
