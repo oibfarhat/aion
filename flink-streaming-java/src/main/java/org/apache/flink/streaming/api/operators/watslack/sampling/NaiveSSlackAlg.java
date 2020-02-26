@@ -1,29 +1,39 @@
 package org.apache.flink.streaming.api.operators.watslack.sampling;
 
+import org.apache.flink.streaming.api.operators.watslack.WindowSSlack;
 import org.apache.flink.streaming.api.operators.watslack.WindowSSlackManager;
+import org.apache.flink.streaming.api.operators.watslack.estimators.WindowSizeEstimator;
 
 public class NaiveSSlackAlg extends AbstractSSlackAlg {
 
+    private static final double TARGET_SR = 0.7;
+
     public NaiveSSlackAlg(
             final WindowSSlackManager sSlackManager,
-            final long windowLength,
-            final long ssLength,
-            final int ssSize) {
-        super(sSlackManager, windowLength, ssLength, ssSize);
-
+            final WindowSizeEstimator srEstimator) {
+        super(sSlackManager, srEstimator);
     }
 
     @Override
-    public void initiatePlan(long windowIndex) {
-        SamplingPlan samplingPlan = new SamplingPlan(windowIndex, ssSize);
-        for (int i = 0; i < ssSize; i++) {
-            samplingPlan.updatePlanFacts(i, 450, 0.5);
+    public void initiatePlan(WindowSSlack windowSSlack) {
+        SamplingPlan samplingPlan =
+                new SamplingPlan(windowSSlack, windowSSlackManager.getSSSize());
+        samplingPlanMap.put(windowSSlack, samplingPlan);
+
+        long ssEventsNum = srEstimator.getEventsNumPerSS(samplingPlan);
+        for (int i = 0; i < windowSSlackManager.getSSSize(); i++) {
+            samplingPlan.updatePlan(i, ssEventsNum, TARGET_SR);
         }
-        samplingPlanMap.put(windowIndex, samplingPlan);
     }
 
     @Override
-    protected void updatePlan(long windowIndex) {
-        // NO UPDATES
+    protected void updatePlan(WindowSSlack windowSSlack) {
+        SamplingPlan plan = samplingPlanMap.get(windowSSlack);
+        long ssEventsNum = srEstimator.getEventsNumPerSS(plan);
+
+        for (int i = 0; i < windowSSlackManager.getSSSize(); i++) {
+            if (!plan.isSSPurged(i))
+                plan.updatePlan(i, ssEventsNum, TARGET_SR);
+        }
     }
 }

@@ -579,7 +579,7 @@ public class OperatorChain<OUT, OP extends StreamOperator<OUT>> implements Strea
 				operator.processElement(copy);
 			} catch (ClassCastException e) {
 				if (outputTag != null) {
-					// Enrich error message
+					// Enrich errorfunc message
 					ClassCastException replace = new ClassCastException(
 						String.format(
 							"%s. Failed to push OutputTag with id '%s' to operator. " +

@@ -24,7 +24,7 @@ import org.apache.flink.streaming.api.operators.StreamingRuntimeContext;
 
 /**
  * Implementation of the SinkFunction writing every tuple to the standard
- * output or standard error stream.
+ * output or standard errorfunc stream.
  *
  * <p>
  * Four possible format options:
@@ -53,7 +53,7 @@ public class PrintSinkFunction<IN> extends RichSinkFunction<IN> {
 	/**
 	 * Instantiates a print sink function that prints to standard out.
 	 *
-	 * @param stdErr True, if the format should print to standard error instead of standard out.
+	 * @param stdErr True, if the format should print to standard errorfunc instead of standard out.
 	 */
 	public PrintSinkFunction(final boolean stdErr) {
 		writer = new PrintSinkOutputWriter<>(stdErr);
@@ -62,7 +62,7 @@ public class PrintSinkFunction<IN> extends RichSinkFunction<IN> {
 	/**
 	 * Instantiates a print sink function that prints to standard out and gives a sink identifier.
 	 *
-	 * @param stdErr True, if the format should print to standard error instead of standard out.
+	 * @param stdErr True, if the format should print to standard errorfunc instead of standard out.
 	 * @param sinkIdentifier Message that identify sink and is prefixed to the output of the value
 	 */
 	public PrintSinkFunction(final String sinkIdentifier, final boolean stdErr) {

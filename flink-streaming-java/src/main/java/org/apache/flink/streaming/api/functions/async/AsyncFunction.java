@@ -33,7 +33,7 @@ import java.util.concurrent.TimeoutException;
  * #asyncInvoke, avoiding blocking for each stream input as long as the internal buffer is not full.
  *
  * <p>{@link ResultFuture} can be passed into callbacks or futures to collect the result data.
- * An error can also be propagate to the async IO operator by
+ * An errorfunc can also be propagate to the async IO operator by
  * {@link ResultFuture#completeExceptionally(Throwable)}.
  *
  * <p>Callback example usage:
@@ -81,7 +81,7 @@ public interface AsyncFunction<IN, OUT> extends Function, Serializable {
 	 *
 	 * @param input element coming from an upstream task
 	 * @param resultFuture to be completed with the result data
-	 * @exception Exception in case of a user code error. An exception will make the task fail and
+	 * @exception Exception in case of a user code errorfunc. An exception will make the task fail and
 	 * trigger fail-over process.
 	 */
 	void asyncInvoke(IN input, ResultFuture<OUT> resultFuture) throws Exception;

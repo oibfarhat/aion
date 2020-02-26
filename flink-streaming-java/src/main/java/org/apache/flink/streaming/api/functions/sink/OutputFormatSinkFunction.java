@@ -107,7 +107,7 @@ public class OutputFormatSinkFunction<IN> extends RichSinkFunction<IN> implement
 				((CleanupWhenUnsuccessful) format).tryCleanupOnError();
 			}
 		} catch (Throwable t) {
-			LOG.error("Cleanup on error failed.", t);
+			LOG.error("Cleanup on errorfunc failed.", t);
 		}
 	}
 

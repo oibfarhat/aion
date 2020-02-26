@@ -1,7 +1,6 @@
 package org.apache.flink.streaming.api.operators.watslack;
 
 import org.apache.flink.streaming.api.operators.watslack.diststore.WindowDistStore;
-import org.apache.flink.streaming.api.operators.watslack.estimators.SSSizeEstimator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,43 +13,29 @@ public class WindowSSlack {
     /* Identifiers for WindowSS */
     private final long windowIndex;
     private final WindowSSlackManager sSlackManager;
-    private final long windowLength;
-    private final long ssLength;
-    private final int ssSize;
 
     /* Stores */
-    private WindowDistStore netDelayStore;
-    private WindowDistStore genDelayStore;
-    /* Estimators */
-    private SSSizeEstimator[] sssEstimator;
-    /*
-     * Book-keeping data structures.
-     * TODO(oibfarhat): I dont feel this is the right place for these data structures.
-     */
+    private final WindowDistStore netDelayStore;
+    private final WindowDistStore genDelayStore;
+
     private final long[] sampledEvents;
     private final long[] shedEvents;
 
     WindowSSlack(
             /* Identifiers */
-            final long windowIndex,
             final WindowSSlackManager sSlackManager,
-            final long windowLength,
-            final long ssLength,
-            final int ssSize,
+            final long windowIndex,
             /* Stores */
             final WindowDistStore netDelayStore,
             final WindowDistStore genDelayStore) {
         this.windowIndex = windowIndex;
         this.sSlackManager = sSlackManager;
-        this.windowLength = windowLength;
-        this.ssLength = ssLength;
-        this.ssSize = ssSize;
 
         this.netDelayStore = netDelayStore;
         this.genDelayStore = genDelayStore;
 
-        this.sampledEvents = new long[ssSize];
-        this.shedEvents = new long[ssSize];
+        this.sampledEvents = new long[sSlackManager.getSSSize()];
+        this.shedEvents = new long[sSlackManager.getSSSize()];
     }
 
     /*
@@ -58,7 +43,7 @@ public class WindowSSlack {
      */
     private int getSSLocalIndex(long eventTime) {
         assert sSlackManager.getWindowIndex(eventTime) == windowIndex;
-        return (int) ((eventTime - (windowIndex * windowLength)) / ssLength);
+        return (int) ((eventTime - (windowIndex * sSlackManager.getWindowLength())) / sSlackManager.getSSLength());
     }
 
     /*
@@ -79,7 +64,7 @@ public class WindowSSlack {
         genDelayStore.addEvent(localSSIndex, eventTime);
 
         /* Consider the algorithm's wise opinion. */
-        if (sSlackManager.getsSlackAlg().sample(windowIndex, localSSIndex)) {
+        if (sSlackManager.getsSlackAlg().sample(this, localSSIndex)) {
             sampledEvents[localSSIndex]++;
             return true;
         }
@@ -94,7 +79,7 @@ public class WindowSSlack {
      */
     public long emitWatermark(long eventTime) {
         int localSSIndex = getSSLocalIndex(eventTime);
-        long totalEvents = sampledEvents[localSSIndex] +shedEvents[localSSIndex];
+        long totalEvents = sampledEvents[localSSIndex] + shedEvents[localSSIndex];
         double ratio = sampledEvents[localSSIndex] / (totalEvents * 1.0);
         return sSlackManager.getsSlackAlg().emitWatermark(windowIndex, localSSIndex, totalEvents, ratio);
 
@@ -102,18 +87,24 @@ public class WindowSSlack {
 
     boolean purgeSS(long maxPurgeTime) {
         boolean succPurged = false;
-        for (long time = windowIndex * windowLength; time <= maxPurgeTime; time += ssLength) {
-            int ssLocalIndex = getSSLocalIndex(maxPurgeTime);
-            boolean newlyPurged = netDelayStore.purgeSS(ssLocalIndex) || genDelayStore.purgeSS(ssLocalIndex);
+        /* Loop through subsamples deadlines */
+        for (long time = windowIndex * sSlackManager.getWindowLength();
+             time <= maxPurgeTime;
+             time += sSlackManager.getSSLength()) {
+
+            int localSSIndex = getSSLocalIndex(time);
+            boolean newlyPurged = netDelayStore.purgeSS(localSSIndex) || genDelayStore.purgeSS(localSSIndex);
+
             if (newlyPurged) {
-                long observedEvents = sampledEvents[ssLocalIndex] + shedEvents[ssLocalIndex];
-                double samplingRatio = sampledEvents[ssLocalIndex] / (observedEvents * 1.0);
+                long observedEvents = getObservedEvents(localSSIndex);
+                double samplingRatio = getSampledEvents(localSSIndex);
                 sSlackManager
-                        .getsSlackAlg().updateAfterPurging(windowIndex, ssLocalIndex, observedEvents, samplingRatio);
+                        .getsSlackAlg()
+                        .updateAfterPurging(this, localSSIndex);
 
                 LOG.info(
                         "Purging {}.{}: [sampled: {}, discarded: {}, total: {}, sampling rate: {}",
-                        windowIndex, ssLocalIndex, sampledEvents[ssLocalIndex], shedEvents[ssLocalIndex],
+                        windowIndex, localSSIndex, getSampledEvents(localSSIndex), shedEvents[localSSIndex],
                         observedEvents, samplingRatio);
             }
             succPurged |= newlyPurged;
@@ -123,5 +114,40 @@ public class WindowSSlack {
 
     public long getWindowIndex() {
         return windowIndex;
+    }
+
+    /* Manipulation functions for book-keept data */
+    public long getObservedEvents() {
+        long sum = 0;
+        for (int i = 0; i < sSlackManager.getSSSize(); i++) {
+            sum += getObservedEvents(i);
+        }
+        return sum;
+    }
+
+    public long getSampledEvents() {
+        long sum = 0;
+        for (int i = 0; i < sSlackManager.getSSSize(); i++) {
+            sum += getSampledEvents(i);
+        }
+        return sum;
+    }
+
+    public double getSamplingRate() {
+        long observedEvents = getObservedEvents();
+        long sampledEvents = getSampledEvents();
+        return (sampledEvents * 1.0) / (observedEvents * 1.0);
+    }
+
+    public double getSamplingRate(int localSSIndex) {
+        return (getSampledEvents(localSSIndex) * 1.0) / (getObservedEvents(localSSIndex) * 1.0);
+    }
+
+    public long getSampledEvents(int localSSIndex) {
+        return sampledEvents[localSSIndex];
+    }
+
+    public long getObservedEvents(int localSSIndex) {
+        return sampledEvents[localSSIndex] + shedEvents[localSSIndex];
     }
 }

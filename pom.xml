@@ -1052,7 +1052,7 @@ under the License.
 				<dependency>
 					<!--
 					This is necessary for building the java docs using Java 8. Otherwise the javadoc
-					plugin will fail with "javadoc: error -
+					plugin will fail with "javadoc: errorfunc -
 						com.sun.tools.doclets.internal.toolkit.util.DocletAbortException:
 							com.sun.tools.javac.code.Symbol$CompletionFailure:
 								class file for akka.testkit.TestKit not found"

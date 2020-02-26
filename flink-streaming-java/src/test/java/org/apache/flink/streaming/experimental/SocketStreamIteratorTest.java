@@ -91,7 +91,7 @@ public class SocketStreamIteratorTest {
 
 		final SocketStreamIterator<Long> iterator = new SocketStreamIterator<>(LongSerializer.INSTANCE);
 
-		// asynchronously set an error
+		// asynchronously set an errorfunc
 		new Thread() {
 			@Override
 			public void run() {

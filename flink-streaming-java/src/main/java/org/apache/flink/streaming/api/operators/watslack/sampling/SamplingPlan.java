@@ -1,50 +1,63 @@
 package org.apache.flink.streaming.api.operators.watslack.sampling;
 
-class SamplingPlan {
-    private final long windowIndex;
-    private final int ssSize;
 
+import org.apache.flink.streaming.api.operators.watslack.WindowSSlack;
+
+public class SamplingPlan {
+    private final WindowSSlack windowSSlack;
     private final long[] ssEventsNum;
     private final double[] samplingRates;
-    private final boolean[] isFactual;
 
+    /* Purging */
+    private int unpurgedSS;
+    private final boolean[] isPurged;
 
-    SamplingPlan(
-            final long windowIndex,
-            final int ssSize) {
-        this.windowIndex = windowIndex;
-        this.ssSize = ssSize;
+    SamplingPlan(final WindowSSlack windowSSlack,
+                 final int ssSize) {
+        this.windowSSlack = windowSSlack;
 
         this.ssEventsNum = new long[ssSize];
         this.samplingRates = new double[ssSize];
-        this.isFactual = new boolean[ssSize];
+        this.isPurged = new boolean[ssSize];
+
+        this.unpurgedSS = ssSize;
     }
 
-    double getSamplingRatio(int ssLocalIndex) {
-        return samplingRates[ssLocalIndex];
+    public void updatePlan(int localSSIndex, long numOfEvents, double sr) {
+        assert !isPurged[localSSIndex];
+
+        ssEventsNum[localSSIndex] = numOfEvents;
+        samplingRates[localSSIndex] = sr;
     }
 
-    long getTargetEvents(int ssLocalIndex) {
-        return ssEventsNum[ssLocalIndex];
+    public int getNumOfUnpurgedSS() {
+        return unpurgedSS;
     }
 
-    void updatePlanFacts(int ssIndex, long observedEvents, double samplingRate) {
-        for (int i = 0; i < ssIndex; i++) {
-            assert isFactual[i];
+    public boolean isSSPurged(int localSSIndex) {
+        return isPurged[localSSIndex];
+    }
+
+    public double getSamplingRate(int localSSIndex) {
+        if (isPurged[localSSIndex]) {
+            return windowSSlack.getSamplingRate(localSSIndex);
         }
-
-        isFactual[ssIndex] = true;
-        ssEventsNum[ssIndex] = observedEvents;
-        samplingRates[ssIndex] = samplingRate;
+        return samplingRates[localSSIndex];
     }
 
-    void updatePlanEstimation(int ssIndex, long projectedEvents, double targetSamplingRate) {
-        if (isFactual[ssIndex]) {
-            // Cannot update these values!
-            return;
+    public long getObservedEvents(int localSSIndex) {
+        if (isPurged[localSSIndex]) {
+            return windowSSlack.getObservedEvents(localSSIndex);
         }
+        return ssEventsNum[localSSIndex];
+    }
 
-        this.ssEventsNum[ssIndex] = projectedEvents;
-        this.samplingRates[ssIndex] = targetSamplingRate; //
+    void purgeSS(int localSSIndex) {
+        for (int i = 0; i <= localSSIndex; i++) {
+            if (!isPurged[i]) {
+                isPurged[i] = true;
+                unpurgedSS--;
+            }
+        }
     }
 }

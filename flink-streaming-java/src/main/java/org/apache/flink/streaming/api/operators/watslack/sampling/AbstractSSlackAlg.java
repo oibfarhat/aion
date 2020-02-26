@@ -1,6 +1,8 @@
 package org.apache.flink.streaming.api.operators.watslack.sampling;
 
+import org.apache.flink.streaming.api.operators.watslack.WindowSSlack;
 import org.apache.flink.streaming.api.operators.watslack.WindowSSlackManager;
+import org.apache.flink.streaming.api.operators.watslack.estimators.WindowSizeEstimator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,57 +20,54 @@ public abstract class AbstractSSlackAlg {
 
     protected static final Logger LOG = LoggerFactory.getLogger(AbstractSSlackAlg.class);
 
-    private static final double MIN_SAMPLING_RATE = 0.1;
-
     protected final WindowSSlackManager windowSSlackManager;
-    protected final long windowLength;
-    protected final long ssLength;
-    protected final int ssSize;
+    protected final WindowSizeEstimator srEstimator;
     /* Data Structures */
-    protected final Map<Long, SamplingPlan> samplingPlanMap;
+    protected final Map<WindowSSlack, SamplingPlan> samplingPlanMap;
     /* Utils */
     protected final Random random;
 
     AbstractSSlackAlg(
             final WindowSSlackManager windowSSlackManager,
-            final long windowLength, final long ssLength, final int ssSize) {
+            final WindowSizeEstimator srEstimator) {
         this.windowSSlackManager = windowSSlackManager;
-        this.windowLength = windowLength;
-        this.ssLength = ssLength;
-        this.ssSize = ssSize;
+        this.srEstimator = srEstimator;
 
         this.samplingPlanMap = new HashMap<>();
 
         this.random = new Random();
     }
 
-    public abstract void initiatePlan(long windowIndex);
+    public abstract void initiatePlan(WindowSSlack windowSSlack);
 
-    protected abstract void updatePlan(long windowIndex);
+    protected abstract void updatePlan(WindowSSlack windowSSlack);
 
-    public void updateAfterPurging(long windowIndex, int ssIndex, long observedEvents, double samplingRate) {
-        SamplingPlan plan = samplingPlanMap.getOrDefault(windowIndex, null);
+    public void updateAfterPurging(WindowSSlack windowSSlack, int localSSIndex) {
+        SamplingPlan plan = samplingPlanMap.getOrDefault(windowSSlack, null);
         if (plan == null) {
-            LOG.warn("Sampling plan is null for window {}.{}.", windowIndex, ssIndex);
+            LOG.warn("Sampling plan is null for window {}.{}.", windowSSlack.getWindowIndex(), localSSIndex);
             return;
         }
 
-        plan.updatePlanFacts(ssIndex, observedEvents, samplingRate);
+        plan.updatePlanFacts(localSSIndex,
+                windowSSlack.getObservedEvents(localSSIndex),
+                windowSSlack.getSamplingRate(localSSIndex));
         /* Estimate the newest values. */
-        updatePlan(windowIndex);
+        updatePlan(windowSSlack);
 
     }
 
-    public boolean sample(long windowIndex, int localSSIndex) {
+    public boolean sample(WindowSSlack windowSSlack, int localSSIndex) {
         // Avoid sampling when warm-up is not done!
         if (!windowSSlackManager.isWarmedUp()) {
             return true;
         }
         // Watermark already emitted
-        if (windowSSlackManager.getLastEmittedWatermark() >= windowSSlackManager.getSSDeadline(windowIndex, localSSIndex)) {
+        if (windowSSlackManager.getLastEmittedWatermark() >=
+                windowSSlackManager.getSSDeadline(windowSSlack.getWindowIndex(), localSSIndex)) {
             return false;
         }
-        return random.nextDouble() <= samplingPlanMap.get(windowIndex).getSamplingRatio(localSSIndex);
+        return random.nextDouble() <= samplingPlanMap.get(windowSSlack).getSamplingRatio(localSSIndex);
     }
 
     public long emitWatermark(long windowIndex, int localSSIndex, long observedEvents, double samplingRate) {

@@ -4,6 +4,7 @@ import org.apache.flink.metrics.Counter;
 import org.apache.flink.metrics.SimpleCounter;
 import org.apache.flink.streaming.api.operators.watslack.diststore.DistStoreManager;
 import org.apache.flink.streaming.api.operators.watslack.diststore.WindowDistStore;
+import org.apache.flink.streaming.api.operators.watslack.estimators.WindowSizeEstimator;
 import org.apache.flink.streaming.api.operators.watslack.sampling.AbstractSSlackAlg;
 import org.apache.flink.streaming.api.operators.watslack.sampling.NaiveSSlackAlg;
 import org.apache.flink.streaming.runtime.tasks.ProcessingTimeService;
@@ -24,8 +25,10 @@ import static org.apache.flink.streaming.api.operators.watslack.diststore.DistSt
 public final class WindowSSlackManager {
 
     protected static final Logger LOG = LoggerFactory.getLogger(WindowSSlackManager.class);
+
     static final int MAX_NET_DELAY = 1000; // We can tolerate up to 500ms max delay.
     private static final int HISTORY_SIZE = 1024;
+
     private final ProcessingTimeService processingTimeService;
     private final AbstractSSlackAlg sSlackAlg;
     /* Logical division of windows */
@@ -51,7 +54,6 @@ public final class WindowSSlackManager {
             final long ssLength,
             final int ssSize) {
         this.processingTimeService = processingTimeService;
-        this.sSlackAlg = new NaiveSSlackAlg(this, windowLength, ssLength, ssSize);
 
         this.windowLength = windowLength;
         this.ssLength = ssLength;
@@ -59,6 +61,11 @@ public final class WindowSSlackManager {
 
         this.netDelayStoreManager = new DistStoreManager(windowLength, ssLength, ssSize, NET_DELAY);
         this.interEventStoreManager = new DistStoreManager(windowLength, ssLength, ssSize, GEN_DELAY);
+
+        WindowSizeEstimator srEstimator =
+                new WindowSizeEstimator(netDelayStoreManager, interEventStoreManager, windowLength, ssLength);
+        this.sSlackAlg = new NaiveSSlackAlg(this, srEstimator);
+
         this.windowSlacksMap = new HashMap<>();
 
         /* Purging */
@@ -69,44 +76,20 @@ public final class WindowSSlackManager {
         this.windowsCounter = new SimpleCounter();
     }
 
-    public WindowSSlack getWindowSlack(long eventTime) {
-        long windowIndex = getWindowIndex(eventTime);
-        WindowSSlack ws = windowSlacksMap.getOrDefault(windowIndex, null);
-        // New window!
-        if (ws == null) {
-            WindowDistStore netDist = netDelayStoreManager.createWindowDistStore(windowIndex);
-            WindowDistStore interEventDist = interEventStoreManager.createWindowDistStore(windowIndex);
-            ws = new WindowSSlack(
-                    windowIndex,
-                    this,
-                    windowLength,
-                    ssLength,
-                    ssSize,
-                    netDist,
-                    interEventDist);
-            windowSlacksMap.put(windowIndex, ws);
-            sSlackAlg.initiatePlan(windowIndex);
-            // Remove from history
-            removeWindowSSlack(windowIndex - HISTORY_SIZE);
-
-            windowsCounter.inc();
-        }
-        return ws;
+    /* Getters & Setters */
+    public long getWindowLength() {
+        return windowLength;
     }
 
-    private void removeWindowSSlack(long windowIndex) {
-        WindowSSlack window = windowSlacksMap.remove(windowIndex - HISTORY_SIZE);
-        if (window != null) {
-            LOG.info("Removing window slack {}", windowIndex);
-            // remove
-        }
+    public long getSSLength() {
+        return ssLength;
     }
 
-    final long getWindowIndex(long eventTime) {
-        return (long) Math.floor(eventTime / (windowLength * 1.0));
+    public int getSSSize() {
+        return ssSize;
     }
 
-    final ProcessingTimeService getProcessingTimeService() {
+    public ProcessingTimeService getProcessingTimeService() {
         return processingTimeService;
     }
 
@@ -122,8 +105,47 @@ public final class WindowSSlackManager {
         lastEmittedWatermark = targetWatermark;
     }
 
+    public WindowSSlack getWindowSSLack(long windowIndex) {
+        return windowSlacksMap.getOrDefault(windowIndex, null);
+    }
+
     public AbstractSSlackAlg getsSlackAlg() {
         return sSlackAlg;
+    }
+
+    /* Map manipulation */
+    public WindowSSlack getWindowSlack(long eventTime) {
+        long windowIndex = getWindowIndex(eventTime);
+        WindowSSlack ws = windowSlacksMap.getOrDefault(windowIndex, null);
+        // New window!
+        if (ws == null) {
+            WindowDistStore netDist = netDelayStoreManager.createWindowDistStore(windowIndex);
+            WindowDistStore interEventDist = interEventStoreManager.createWindowDistStore(windowIndex);
+            ws = new WindowSSlack(
+                    this,
+                    windowIndex,
+                    netDist,
+                    interEventDist);
+            windowSlacksMap.put(windowIndex, ws);
+            sSlackAlg.initiatePlan(windowIndex);
+            // Remove from history
+            removeWindowSSlack(windowIndex - HISTORY_SIZE);
+            windowsCounter.inc();
+        }
+        return ws;
+    }
+
+    private void removeWindowSSlack(long windowIndex) {
+        WindowSSlack window = windowSlacksMap.remove(windowIndex - HISTORY_SIZE);
+        if (window != null) {
+            LOG.info("Removing window slack {}", windowIndex);
+            // remove
+        }
+    }
+
+    /* Index & Deadlines calculation */
+    final long getWindowIndex(long eventTime) {
+        return (long) Math.floor(eventTime / (windowLength * 1.0));
     }
 
     public long getWindowDeadline(long windowIndex) {
@@ -134,7 +156,7 @@ public final class WindowSSlackManager {
         return windowIndex * windowLength + (ssIndex + 1) * ssLength;
     }
 
-    /* Runnable that purges substreams stats */
+    /* Purging Runnable that purges substreams stats */
     private class SSStatsPurger implements Runnable {
 
         private long currTime;

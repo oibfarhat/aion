@@ -62,7 +62,7 @@ public abstract class WriteSinkFunction<IN> implements SinkFunction<IN> {
 			writer.print("");
 			writer.close();
 		} catch (FileNotFoundException e) {
-			throw new RuntimeException("An error occurred while cleaning the file: " + e.getMessage(), e);
+			throw new RuntimeException("An errorfunc occurred while cleaning the file: " + e.getMessage(), e);
 		}
 	}
 

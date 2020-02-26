@@ -182,7 +182,7 @@ public abstract class AbstractStreamOperator<OUT>
 			}
 			this.metrics = operatorMetricGroup;
 		} catch (Exception e) {
-			LOG.warn("An error occurred while instantiating task metrics.", e);
+			LOG.warn("An errorfunc occurred while instantiating task metrics.", e);
 			this.metrics = UnregisteredMetricGroups.createUnregisteredOperatorMetricGroup();
 			this.output = output;
 		}
@@ -214,7 +214,7 @@ public abstract class AbstractStreamOperator<OUT>
 				getOperatorID(),
 				granularity);
 		} catch (Exception e) {
-			LOG.warn("An error occurred while instantiating latency metrics.", e);
+			LOG.warn("An errorfunc occurred while instantiating latency metrics.", e);
 			this.latencyStats = new LatencyStats(
 				UnregisteredMetricGroups.createUnregisteredTaskManagerJobMetricGroup().addGroup("latency"),
 				1,

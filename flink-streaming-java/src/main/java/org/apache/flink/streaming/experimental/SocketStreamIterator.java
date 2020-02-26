@@ -59,7 +59,7 @@ public class SocketStreamIterator<T> implements Iterator<T> {
 	/** The socket for the specific stream. */
 	private Socket connectedSocket;
 
-	/** Async error, for example by the executor of the program that produces the stream. */
+	/** Async errorfunc, for example by the executor of the program that produces the stream. */
 	private volatile Throwable error;
 
 	/**
@@ -186,7 +186,7 @@ public class SocketStreamIterator<T> implements Iterator<T> {
 				throw e;
 			}
 			else {
-				// throw the root cause error
+				// throw the root cause errorfunc
 				throw new Exception("Receiving stream failed: " + error.getMessage(), error);
 			}
 		}

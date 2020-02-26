@@ -9,16 +9,17 @@ public class GenDelaySSStore implements SSDistStore {
 
     protected static final Logger LOG = LoggerFactory.getLogger(GenDelaySSStore.class);
 
-    private final long windowIndex;
+    private final WindowDistStore windowDistStore;
     private final long ssIndex;
+
     private final PriorityQueue<Long> eventsQueue;
     private double mean;
     private double sd;
     private long count;
     private boolean isPurged;
 
-    GenDelaySSStore(final long windowIndex, final long ssIndex) {
-        this.windowIndex = windowIndex;
+    GenDelaySSStore(final WindowDistStore windowDistStore, final long ssIndex) {
+        this.windowDistStore = windowDistStore;
         this.ssIndex = ssIndex;
         this.mean = 0;
         this.sd = 0;
@@ -28,8 +29,18 @@ public class GenDelaySSStore implements SSDistStore {
     }
 
     @Override
+    public long getWindowIndex() {
+        return windowDistStore.getWindowIndex();
+    }
+
+    @Override
     public long getSSIndex() {
         return ssIndex;
+    }
+
+    @Override
+    public boolean isPurged() {
+        return isPurged;
     }
 
     @Override
@@ -69,7 +80,35 @@ public class GenDelaySSStore implements SSDistStore {
             this.mean /= count;
             this.sd = (this.sd / this.count) - (this.mean * this.mean);
         }
-        LOG.info("Purging SS {}.{}: (mu={}, sd={}, count={})", windowIndex, ssIndex, mean, sd, count);
+        LOG.info("Purging SS {}.{}: (mu={}, sd={}, count={})", getWindowIndex(), ssIndex, mean, sd, count);
         this.eventsQueue.clear();
+    }
+
+    @Override
+    public double getMean() {
+        if (this.isPurged) {
+            return this.mean;
+        }
+        LOG.warn("Retrieving the mean of a non-purged substream");
+        return -1;
+    }
+
+    @Override
+    public double getSD() {
+        if (this.isPurged) {
+            return this.sd;
+        }
+        LOG.warn("Retrieving the SD of a non-purged substream");
+        return -1;
+    }
+
+
+    @Override
+    public long getCount() {
+        if (this.isPurged) {
+            return this.count;
+        }
+        LOG.warn("Retrieving the count of a non-purged substream");
+        return -1;
     }
 }

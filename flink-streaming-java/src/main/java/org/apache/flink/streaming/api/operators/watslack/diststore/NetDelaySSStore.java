@@ -3,20 +3,25 @@ package org.apache.flink.streaming.api.operators.watslack.diststore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.event.WindowStateListener;
+
 public class NetDelaySSStore implements SSDistStore {
 
     protected static final Logger LOG = LoggerFactory.getLogger(NetDelaySSStore.class);
 
-    private final long windowIndex;
+    /* Identifiers */
+    private final WindowDistStore windowDistStore;
     private final long ssIndex;
+
     private double mean;
-    private  double sd;
+    private double sd;
     private long count;
     private boolean isPurged;
 
-    NetDelaySSStore(final long windowIndex, final long ssIndex) {
-        this.windowIndex = windowIndex;
+    NetDelaySSStore(final WindowDistStore windowDistStore, final long ssIndex) {
+        this.windowDistStore = windowDistStore;
         this.ssIndex = ssIndex;
+
         this.mean = 0;
         this.sd = 0;
         this.count = 0;
@@ -24,8 +29,18 @@ public class NetDelaySSStore implements SSDistStore {
     }
 
     @Override
+    public long getWindowIndex() {
+        return windowDistStore.getWindowIndex();
+    }
+
+    @Override
     public long getSSIndex() {
         return ssIndex;
+    }
+
+    @Override
+    public boolean isPurged() {
+        return isPurged;
     }
 
     @Override
@@ -50,7 +65,35 @@ public class NetDelaySSStore implements SSDistStore {
             this.mean /= count;
             this.sd = (this.sd / this.count) - (this.mean * this.mean);
         }
-        LOG.info("Purging SS {}.{}: (mu={}, sd={}, count={})", windowIndex, ssIndex, mean, sd, count);
+        LOG.info("Purging SS {}.{}: (mu={}, sd={}, count={})", getWindowIndex(), ssIndex, mean, sd, count);
         this.isPurged = true;
+    }
+
+    @Override
+    public double getMean() {
+        if (this.isPurged) {
+            return this.mean;
+        }
+        LOG.warn("Retrieving the mean of a non-purged substream");
+        return -1;
+    }
+
+    @Override
+    public double getSD() {
+        if (this.isPurged) {
+            return this.sd;
+        }
+        LOG.warn("Retrieving the SD of a non-purged substream");
+        return -1;
+    }
+
+
+    @Override
+    public long getCount() {
+        if (this.isPurged) {
+            return this.count;
+        }
+        LOG.warn("Retrieving the count of a non-purged substream");
+        return -1;
     }
 }

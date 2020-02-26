@@ -1,27 +1,30 @@
 package org.apache.flink.streaming.api.operators.watslack.diststore;
 
+import org.apache.flink.streaming.api.operators.watslack.WindowSSlack;
+
 public class WindowDistStore {
 
-    private final long windowIndex;
+    private final WindowSSlack windowSSlack;
     private final SSDistStore[] ssStores;
-    /* Purging Specific */
-    private final boolean[] isSSPurged;
     private DistStoreManager distStoreManager;
 
     WindowDistStore(
-            final long windowIndex,
+            final WindowSSlack windowSSlack,
             final DistStoreManager distStoreManager,
             final int ssSize) {
-        this.windowIndex = windowIndex;
+        this.windowSSlack = windowSSlack;
         this.distStoreManager = distStoreManager;
-        this.isSSPurged = new boolean[ssSize];
 
         this.ssStores = new SSDistStore[ssSize];
         for (int i = 0; i < ssSize; i++) {
             ssStores[i] =
                     distStoreManager.getStoreType() == DistStoreManager.DistStoreType.NET_DELAY ?
-                            new NetDelaySSStore(windowIndex, i) : new GenDelaySSStore(windowIndex, i);
+                            new NetDelaySSStore(this, i) : new GenDelaySSStore(this, i);
         }
+    }
+
+    long getWindowIndex() {
+        return windowSSlack.getWindowIndex();
     }
 
     public void addEvent(int ssLocalIndex, long value) {
@@ -29,9 +32,9 @@ public class WindowDistStore {
     }
 
     public boolean purgeSS(int ssLocalIndex) {
-        if (!isSSPurged[ssLocalIndex]) {
+        if (!ssStores[ssLocalIndex].isPurged()) {
             ssStores[ssLocalIndex].purge();
-            isSSPurged[ssLocalIndex] = true;
+            distStoreManager.addPurgedSS(ssStores[ssLocalIndex]);
             return true;
         }
         return false;

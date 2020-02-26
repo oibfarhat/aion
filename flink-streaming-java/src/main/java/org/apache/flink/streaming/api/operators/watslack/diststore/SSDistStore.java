@@ -5,9 +5,19 @@ package org.apache.flink.streaming.api.operators.watslack.diststore;
  */
 public interface SSDistStore {
 
+    long getWindowIndex();
+
     long getSSIndex();
+
+    boolean isPurged();
 
     void addValue(long eventTime);
 
     void purge();
+
+    double getMean();
+
+    double getSD();
+
+    long getCount();
 }

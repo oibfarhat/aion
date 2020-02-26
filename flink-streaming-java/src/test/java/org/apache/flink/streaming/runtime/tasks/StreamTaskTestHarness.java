@@ -266,7 +266,7 @@ public class StreamTaskTestHarness<OUT> {
 
 		taskThread.join(timeout);
 		if (taskThread.getError() != null) {
-			throw new Exception("error in task", taskThread.getError());
+			throw new Exception("errorfunc in task", taskThread.getError());
 		}
 	}
 
@@ -297,7 +297,7 @@ public class StreamTaskTestHarness<OUT> {
 					Thread.sleep(10);
 					if (!taskThread.isAlive()) {
 						if (taskThread.getError() != null) {
-							throw new Exception("Task Thread failed due to an error.", taskThread.getError());
+							throw new Exception("Task Thread failed due to an errorfunc.", taskThread.getError());
 						} else {
 							throw new Exception("Task Thread unexpectedly shut down.");
 						}

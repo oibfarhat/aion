@@ -69,7 +69,7 @@ public class SystemProcessingTimeServiceTest extends TestLogger {
 			future.get();
 			assertEquals(0, timer.getNumTasksScheduled());
 
-			// check that no asynchronous error was reported
+			// check that no asynchronous errorfunc was reported
 			if (errorRef.get() != null) {
 				throw new Exception(errorRef.get());
 			}
@@ -115,7 +115,7 @@ public class SystemProcessingTimeServiceTest extends TestLogger {
 			// cancel periodic callback
 			future.cancel(true);
 
-			// check that no asynchronous error was reported
+			// check that no asynchronous errorfunc was reported
 			if (errorRef.get() != null) {
 				throw new Exception(errorRef.get());
 			}
@@ -335,7 +335,7 @@ public class SystemProcessingTimeServiceTest extends TestLogger {
 			// nothing should be scheduled right now
 			assertEquals(0L, timer.getNumTasksScheduled());
 
-			// check that no asynchronous error was reported - that ensures that the newly scheduled
+			// check that no asynchronous errorfunc was reported - that ensures that the newly scheduled
 			// triggerable did, in fact, not trigger
 			if (errorRef.get() != null) {
 				throw new Exception(errorRef.get());
@@ -381,7 +381,7 @@ public class SystemProcessingTimeServiceTest extends TestLogger {
 
 			assertEquals(0, timer.getNumTasksScheduled());
 
-			// check that no asynchronous error was reported
+			// check that no asynchronous errorfunc was reported
 			if (errorRef.get() != null) {
 				throw new Exception(errorRef.get());
 			}

@@ -1,7 +1,6 @@
 package org.apache.flink.streaming.api.operators.watslack.diststore;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class DistStoreManager {
 
@@ -17,6 +16,8 @@ public class DistStoreManager {
     private final DistStoreType storeType;
     private final Map<Long, WindowDistStore> distStoreByWindow;
 
+    private final Set<SSDistStore> purgedSSSet;
+
     public DistStoreManager(
             final long windowLength,
             final long ssLength,
@@ -28,6 +29,7 @@ public class DistStoreManager {
         this.storeType = storeType;
 
         this.distStoreByWindow = new HashMap<>();
+        this.purgedSSSet = new TreeSet<>();
     }
 
     public WindowDistStore createWindowDistStore(long windowIndex) {
@@ -36,8 +38,24 @@ public class DistStoreManager {
         return windowStore;
     }
 
+    /*
+     * @return the set of purged substreams
+     */
+    public Set<SSDistStore> getPurgedData() {
+        return purgedSSSet;
+    }
+
     public boolean removeWindowDistStore(long windowIndex) {
-        return distStoreByWindow.remove(windowIndex) != null;
+        WindowDistStore store = distStoreByWindow.remove(windowIndex);
+        if (store == null) {
+            return false;
+        }
+        purgedSSSet.removeIf(ssStore -> ssStore.getWindowIndex() == windowIndex);
+        return true;
+    }
+
+    public void addPurgedSS(SSDistStore purgedSS) {
+        purgedSSSet.add(purgedSS);
     }
 
     DistStoreType getStoreType() {
