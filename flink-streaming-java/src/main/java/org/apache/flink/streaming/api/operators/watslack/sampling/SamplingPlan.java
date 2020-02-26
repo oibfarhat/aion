@@ -3,7 +3,7 @@ package org.apache.flink.streaming.api.operators.watslack.sampling;
 
 import org.apache.flink.streaming.api.operators.watslack.WindowSSlack;
 
-public class SamplingPlan {
+class SamplingPlan {
     private final WindowSSlack windowSSlack;
     private final long[] ssEventsNum;
     private final double[] samplingRates;

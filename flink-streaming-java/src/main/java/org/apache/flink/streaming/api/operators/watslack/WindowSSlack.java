@@ -79,10 +79,7 @@ public class WindowSSlack {
      */
     public long emitWatermark(long eventTime) {
         int localSSIndex = getSSLocalIndex(eventTime);
-        long totalEvents = sampledEvents[localSSIndex] + shedEvents[localSSIndex];
-        double ratio = sampledEvents[localSSIndex] / (totalEvents * 1.0);
-        return sSlackManager.getsSlackAlg().emitWatermark(windowIndex, localSSIndex, totalEvents, ratio);
-
+        return sSlackManager.getsSlackAlg().emitWatermark(this, localSSIndex, getObservedEvents(localSSIndex));
     }
 
     boolean purgeSS(long maxPurgeTime) {
@@ -117,7 +114,7 @@ public class WindowSSlack {
     }
 
     /* Manipulation functions for book-keept data */
-    public long getObservedEvents() {
+    private long getObservedEvents() {
         long sum = 0;
         for (int i = 0; i < sSlackManager.getSSSize(); i++) {
             sum += getObservedEvents(i);
@@ -125,7 +122,7 @@ public class WindowSSlack {
         return sum;
     }
 
-    public long getSampledEvents() {
+    private long getSampledEvents() {
         long sum = 0;
         for (int i = 0; i < sSlackManager.getSSSize(); i++) {
             sum += getSampledEvents(i);
@@ -133,7 +130,11 @@ public class WindowSSlack {
         return sum;
     }
 
-    public double getSamplingRate() {
+    private long getSampledEvents(int localSSIndex) {
+        return sampledEvents[localSSIndex];
+    }
+
+    private double getSamplingRate() {
         long observedEvents = getObservedEvents();
         long sampledEvents = getSampledEvents();
         return (sampledEvents * 1.0) / (observedEvents * 1.0);
@@ -141,10 +142,6 @@ public class WindowSSlack {
 
     public double getSamplingRate(int localSSIndex) {
         return (getSampledEvents(localSSIndex) * 1.0) / (getObservedEvents(localSSIndex) * 1.0);
-    }
-
-    public long getSampledEvents(int localSSIndex) {
-        return sampledEvents[localSSIndex];
     }
 
     public long getObservedEvents(int localSSIndex) {

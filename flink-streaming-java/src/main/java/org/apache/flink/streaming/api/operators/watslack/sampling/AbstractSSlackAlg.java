@@ -49,12 +49,10 @@ public abstract class AbstractSSlackAlg {
             return;
         }
 
-        plan.updatePlanFacts(localSSIndex,
-                windowSSlack.getObservedEvents(localSSIndex),
-                windowSSlack.getSamplingRate(localSSIndex));
+        /* Purge the SS part of the plan. */
+        plan.purgeSS(localSSIndex);
         /* Estimate the newest values. */
         updatePlan(windowSSlack);
-
     }
 
     public boolean sample(WindowSSlack windowSSlack, int localSSIndex) {
@@ -67,21 +65,21 @@ public abstract class AbstractSSlackAlg {
                 windowSSlackManager.getSSDeadline(windowSSlack.getWindowIndex(), localSSIndex)) {
             return false;
         }
-        return random.nextDouble() <= samplingPlanMap.get(windowSSlack).getSamplingRatio(localSSIndex);
+        return random.nextDouble() <= samplingPlanMap.get(windowSSlack).getSamplingRate(localSSIndex);
     }
 
-    public long emitWatermark(long windowIndex, int localSSIndex, long observedEvents, double samplingRate) {
+    public long emitWatermark(WindowSSlack windowSSlack, int localSSIndex, long observedEvents) {
         // Avoid sampling when warm-up is not done!
         if (!windowSSlackManager.isWarmedUp()) {
             return -1;
         }
-        long watermarkTarget = windowSSlackManager.getSSDeadline(windowIndex, localSSIndex);
+        long watermarkTarget = windowSSlackManager.getSSDeadline(windowSSlack.getWindowIndex(), localSSIndex);
         // Watermark already emitted
         if (windowSSlackManager.getLastEmittedWatermark() >= watermarkTarget) {
             return -1;
         }
-        SamplingPlan plan = samplingPlanMap.getOrDefault(windowIndex, null);
-        if (plan.getTargetEvents(localSSIndex) <= observedEvents && plan.getSamplingRatio(localSSIndex) <= samplingRate) {
+        SamplingPlan plan = samplingPlanMap.getOrDefault(windowSSlack, null);
+        if (plan.getObservedEvents(localSSIndex) <= observedEvents) {
             return watermarkTarget;
         }
         return -1;

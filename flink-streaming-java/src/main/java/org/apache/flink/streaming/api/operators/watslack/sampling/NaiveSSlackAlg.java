@@ -20,7 +20,7 @@ public class NaiveSSlackAlg extends AbstractSSlackAlg {
                 new SamplingPlan(windowSSlack, windowSSlackManager.getSSSize());
         samplingPlanMap.put(windowSSlack, samplingPlan);
 
-        long ssEventsNum = srEstimator.getEventsNumPerSS(samplingPlan);
+        long ssEventsNum = srEstimator.getEventsNumPerSS();
         for (int i = 0; i < windowSSlackManager.getSSSize(); i++) {
             samplingPlan.updatePlan(i, ssEventsNum, TARGET_SR);
         }
@@ -29,7 +29,7 @@ public class NaiveSSlackAlg extends AbstractSSlackAlg {
     @Override
     protected void updatePlan(WindowSSlack windowSSlack) {
         SamplingPlan plan = samplingPlanMap.get(windowSSlack);
-        long ssEventsNum = srEstimator.getEventsNumPerSS(plan);
+        long ssEventsNum = srEstimator.getEventsNumPerSS();
 
         for (int i = 0; i < windowSSlackManager.getSSSize(); i++) {
             if (!plan.isSSPurged(i))

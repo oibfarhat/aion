@@ -28,7 +28,7 @@ public class WindowSizeEstimator {
         this.genDelayManager = genDelayManager;
     }
 
-    public long getEventsNumPerSS(SamplingPlan plan) {
+    public long getEventsNumPerSS() {
         Set<SSDistStore> purgedNetDelay = netDelayManager.getPurgedData();
         Set<SSDistStore> purgedGenDelay = genDelayManager.getPurgedData();
 
