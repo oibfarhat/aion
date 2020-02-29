@@ -324,6 +324,7 @@ public class StreamSourceContexts {
 
 		@Override
 		protected void processAndCollectWithTimestamp(T element, long timestamp) {
+			System.out.println(timestamp);
 			WindowSSlack window = windowSSlackManager.getWindowSlack(timestamp);
 			if (window.sample(timestamp)) {
 				output.collect(reuse.replace(element, timestamp));
