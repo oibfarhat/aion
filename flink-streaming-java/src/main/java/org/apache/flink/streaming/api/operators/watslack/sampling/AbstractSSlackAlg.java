@@ -1,5 +1,8 @@
 package org.apache.flink.streaming.api.operators.watslack.sampling;
 
+import org.apache.flink.metrics.Histogram;
+import org.apache.flink.metrics.HistogramStatistics;
+import org.apache.flink.runtime.metrics.DescriptiveStatisticsHistogram;
 import org.apache.flink.streaming.api.operators.watslack.WindowSSlack;
 import org.apache.flink.streaming.api.operators.watslack.WindowSSlackManager;
 import org.apache.flink.streaming.api.operators.watslack.estimators.WindowSizeEstimator;
@@ -9,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
+import static org.apache.flink.streaming.api.operators.watslack.WindowSSlackManager.STATS_SIZE;
 
 /**
  * This class determines sampling rates across for each substream.
@@ -26,6 +31,9 @@ public abstract class AbstractSSlackAlg {
     protected final Map<WindowSSlack, SamplingPlan> samplingPlanMap;
     /* Utils */
     protected final Random random;
+    /* Metrics */
+    protected final Histogram sizeEstimationErrorHisto;
+    protected final Histogram srEstimationErrorHisto;
 
     AbstractSSlackAlg(
             final WindowSSlackManager windowSSlackManager,
@@ -36,6 +44,9 @@ public abstract class AbstractSSlackAlg {
         this.samplingPlanMap = new HashMap<>();
 
         this.random = new Random();
+
+        this.sizeEstimationErrorHisto = new DescriptiveStatisticsHistogram(STATS_SIZE);
+        this.srEstimationErrorHisto = new DescriptiveStatisticsHistogram(STATS_SIZE);
     }
 
     public void initWindow(WindowSSlack windowSSlack) {
@@ -54,6 +65,11 @@ public abstract class AbstractSSlackAlg {
             LOG.warn("Sampling plan is null for window {}.{}.", windowSSlack.getWindowIndex(), localSSIndex);
             return;
         }
+
+        sizeEstimationErrorHisto.update(
+                (Math.abs(plan.getObservedEvents(localSSIndex) - windowSSlack.getObservedEvents(localSSIndex))));
+        srEstimationErrorHisto.update(
+                ((long) (1000 * Math.abs(plan.getSamplingRate(localSSIndex) - windowSSlack.getSamplingRate(localSSIndex)))));
 
         /* Purge the SS part of the plan. */
         plan.purgeSS(localSSIndex);
@@ -96,6 +112,15 @@ public abstract class AbstractSSlackAlg {
         }
         return -1;
     }
+
+    public HistogramStatistics getSizeEstimationStatistics() {
+        return sizeEstimationErrorHisto.getStatistics();
+    }
+
+    public HistogramStatistics getSREstimationStatistics() {
+        return srEstimationErrorHisto.getStatistics();
+    }
+
 
     protected abstract void initiatePlan(WindowSSlack windowSSlack, SamplingPlan samplingPlan);
 

@@ -1,7 +1,11 @@
 package org.apache.flink.streaming.api.operators.watslack;
 
 import org.apache.flink.metrics.Counter;
+import org.apache.flink.metrics.Histogram;
+import org.apache.flink.metrics.HistogramStatistics;
 import org.apache.flink.metrics.SimpleCounter;
+import org.apache.flink.runtime.metrics.DescriptiveStatisticsHistogram;
+import org.apache.flink.runtime.metrics.groups.UnregisteredMetricGroups;
 import org.apache.flink.streaming.api.operators.watslack.diststore.DistStoreManager;
 import org.apache.flink.streaming.api.operators.watslack.diststore.WindowDistStore;
 import org.apache.flink.streaming.api.operators.watslack.estimators.WindowSizeEstimator;
@@ -11,8 +15,8 @@ import org.apache.flink.streaming.runtime.tasks.ProcessingTimeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.apache.flink.streaming.api.operators.watslack.diststore.DistStoreManager.DistStoreType.GEN_DELAY;
 import static org.apache.flink.streaming.api.operators.watslack.diststore.DistStoreManager.DistStoreType.NET_DELAY;
@@ -28,6 +32,7 @@ public final class WindowSSlackManager {
 
     static final int MAX_NET_DELAY = 1000; // We can tolerate up to 500ms max delay.
     private static final int HISTORY_SIZE = 1024;
+    public static final int STATS_SIZE = 10000;
 
     private final ProcessingTimeService processingTimeService;
     private final AbstractSSlackAlg sSlackAlg;
@@ -44,6 +49,7 @@ public final class WindowSSlackManager {
     private final Map<Long, WindowSSlack> windowSlacksMap;
     /* Metrics */
     private final Counter windowsCounter;
+
     /* Stats purger */
     private final Thread timestampsPurger;
     private boolean isWarmedUp;
@@ -160,6 +166,60 @@ public final class WindowSSlackManager {
         return windowIndex * windowLength + (ssIndex + 1) * ssLength;
     }
 
+    public void printStats() {
+        StringBuilder sb = new StringBuilder();
+        // This is gonna be a length function.
+        sb.append("Number of Windows observed:\t").append(windowsCounter.getCount()).append("\n");
+        sb.append("===\n");
+
+        List<WindowSSlack> windows = new ArrayList<>(windowSlacksMap.values());
+        windows.sort((left, right) -> (int) (left.getWindowIndex() - right.getWindowIndex()));
+
+        for(WindowSSlack window : windows) {
+            HistogramStatistics numOfEvents = window.getEventsPerSSHisto().getStatistics();
+            HistogramStatistics sr = window.getSamplingRatePerSSHisto().getStatistics();
+
+            sb.append("Window:\t").append(window.getWindowIndex()).append("\n");
+            sb.append("Number of Events per SS:\t")
+                    .append(numOfEvents.size()).append("\t")
+                    .append(numOfEvents.getMean()).append("\t")
+                    .append(numOfEvents.getStdDev()).append("\n");
+            sb.append("Sampling Rate per SS:\t")
+                    .append(sr.size()).append("\t")
+                    .append(sr.getMean()).append("\t")
+                    .append(sr.getStdDev()).append("\n");
+            sb.append("===\n");
+        }
+
+        // Algorithm
+        HistogramStatistics algSizeError = getsSlackAlg().getSizeEstimationStatistics();
+        HistogramStatistics algSRError = getsSlackAlg().getSREstimationStatistics();
+        sb.append("Algorithm Stats:\n");
+        sb.append("Size Error Estimation:\t")
+                .append(algSizeError.size()).append("\t")
+                .append(algSizeError.getMean()).append("\t")
+                .append(algSizeError.getStdDev()).append("\n");
+        sb.append("Sampling-Rate Error Estimation:\t")
+                .append(algSRError.size()).append("\t")
+                .append(algSRError.getMean()).append("\t")
+                .append(algSRError.getStdDev()).append("\n");
+        sb.append("===\n");
+        // Network & Inter-Event Gen Delays
+        HistogramStatistics netDelay = netDelayStoreManager.getMeanDelay();
+        HistogramStatistics interEventDelay = interEventStoreManager.getMeanDelay();
+        sb.append("Delays:\n");
+        sb.append("Net Delay:\t")
+                .append(netDelay.size()).append("\t")
+                .append(netDelay.getMean()).append("\t")
+                .append(netDelay.getStdDev()).append("\n");
+        sb.append("Inter-Event Generation Delay:\t")
+                .append(interEventDelay.size()).append("\t")
+                .append(interEventDelay.getMean()).append("\t")
+                .append(interEventDelay.getStdDev()).append("\n");
+        sb.append("===\n");
+        System.out.println(sb.toString());
+    }
+
     /* Purging Runnable that purges substreams stats */
     private class SSStatsPurger implements Runnable {
 
@@ -175,7 +235,6 @@ public final class WindowSSlackManager {
 
             while (true) {
                 long windowIndex = getWindowIndex(currTime);
-
                 // TODO(oibfarhat): Consider making this more efficient
                 for (long currIndex = windowIndex - 15; currIndex <= windowIndex; currIndex++) {
                     WindowSSlack ws = windowSlacksMap.getOrDefault(windowIndex, null);

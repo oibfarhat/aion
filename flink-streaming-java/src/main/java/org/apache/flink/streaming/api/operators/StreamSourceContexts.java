@@ -35,6 +35,8 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.concurrent.ScheduledFuture;
 
+import static org.apache.flink.streaming.api.watermark.Watermark.MAX_WATERMARK;
+
 /**
  * Source contexts for various stream time characteristics.
  */
@@ -198,7 +200,6 @@ public class StreamSourceContexts {
 				final long watermarkTime = lastRecordTime - (lastRecordTime % watermarkInterval);
 				nextWatermarkTime = watermarkTime + watermarkInterval;
 				output.emitWatermark(new Watermark(watermarkTime));
-
 				// we do not need to register another timer here
 				// because the emitting task will do so.
 			}
@@ -220,7 +221,6 @@ public class StreamSourceContexts {
 		protected void processAndEmitWatermark(Watermark mark) {
 			nextWatermarkTime = Long.MAX_VALUE;
 			output.emitWatermark(mark);
-
 			// we can shutdown the watermark timer now, no watermarks will be needed any more.
 			// Note that this procedure actually doesn't need to be synchronized with the lock,
 			// but since it's only a one-time thing, doesn't hurt either
@@ -324,7 +324,6 @@ public class StreamSourceContexts {
 
 		@Override
 		protected void processAndCollectWithTimestamp(T element, long timestamp) {
-			System.out.println(timestamp);
 			WindowSSlack window = windowSSlackManager.getWindowSlack(timestamp);
 			if (window.sample(timestamp)) {
 				output.collect(reuse.replace(element, timestamp));
@@ -360,6 +359,7 @@ public class StreamSourceContexts {
 		@Override
 		public void close() {
 			super.close();
+			windowSSlackManager.printStats();
 		}
 	}
 	/**

@@ -1,10 +1,13 @@
 package org.apache.flink.streaming.api.operators.watslack;
 
+import org.apache.flink.metrics.Histogram;
+import org.apache.flink.runtime.metrics.DescriptiveStatisticsHistogram;
 import org.apache.flink.streaming.api.operators.watslack.diststore.WindowDistStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.apache.flink.streaming.api.operators.watslack.WindowSSlackManager.MAX_NET_DELAY;
+import static org.apache.flink.streaming.api.operators.watslack.WindowSSlackManager.STATS_SIZE;
 
 public class WindowSSlack {
 
@@ -21,6 +24,10 @@ public class WindowSSlack {
     private final long[] sampledEvents;
     private final long[] shedEvents;
 
+    /* Metrics */
+    private final Histogram eventsPerSSHisto;
+    private final Histogram samplingRatePerSSHisto;
+
     WindowSSlack(
             /* Identifiers */
             final WindowSSlackManager sSlackManager,
@@ -33,6 +40,9 @@ public class WindowSSlack {
 
         this.sampledEvents = new long[sSlackManager.getSSSize()];
         this.shedEvents = new long[sSlackManager.getSSSize()];
+
+        this.eventsPerSSHisto = new DescriptiveStatisticsHistogram(STATS_SIZE);
+        this.samplingRatePerSSHisto = new DescriptiveStatisticsHistogram(STATS_SIZE);
     }
 
     /*
@@ -100,6 +110,9 @@ public class WindowSSlack {
                         "Purging {}.{}: [sampled: {}, discarded: {}, total: {}, sr: {}",
                         windowIndex, localSSIndex, getSampledEvents(localSSIndex), shedEvents[localSSIndex],
                         observedEvents, samplingRatio);
+
+                eventsPerSSHisto.update(observedEvents);
+                samplingRatePerSSHisto.update((long) (samplingRatio * 1000));
             }
             succPurged |= newlyPurged;
         }
@@ -147,5 +160,14 @@ public class WindowSSlack {
 
     public long getObservedEvents(int localSSIndex) {
         return sampledEvents[localSSIndex] + shedEvents[localSSIndex];
+    }
+
+    /* Metrics */
+    Histogram getEventsPerSSHisto() {
+        return eventsPerSSHisto;
+    }
+
+    Histogram getSamplingRatePerSSHisto() {
+        return samplingRatePerSSHisto;
     }
 }

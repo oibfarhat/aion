@@ -100,6 +100,7 @@ public class StreamSource<OUT, SRC extends SourceFunction<OUT>> extends Abstract
 			}
 		} finally {
 			// make sure that the context is closed in any case
+			System.out.println("Closing the context source!");
 			ctx.close();
 			if (latencyEmitter != null) {
 				latencyEmitter.close();
