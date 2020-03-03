@@ -1,6 +1,6 @@
-package org.apache.flink.streaming.api.operators.watslack.diststore;
+package org.apache.flink.streaming.api.operators.aion.diststore;
 
-import org.apache.flink.streaming.api.operators.watslack.WindowSSlack;
+import org.apache.flink.streaming.api.operators.aion.WindowSSlack;
 
 public class WindowDistStore {
 

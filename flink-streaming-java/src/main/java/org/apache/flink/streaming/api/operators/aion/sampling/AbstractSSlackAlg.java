@@ -1,11 +1,11 @@
-package org.apache.flink.streaming.api.operators.watslack.sampling;
+package org.apache.flink.streaming.api.operators.aion.sampling;
 
 import org.apache.flink.metrics.Histogram;
 import org.apache.flink.metrics.HistogramStatistics;
 import org.apache.flink.runtime.metrics.DescriptiveStatisticsHistogram;
-import org.apache.flink.streaming.api.operators.watslack.WindowSSlack;
-import org.apache.flink.streaming.api.operators.watslack.WindowSSlackManager;
-import org.apache.flink.streaming.api.operators.watslack.estimators.WindowSizeEstimator;
+import org.apache.flink.streaming.api.operators.aion.WindowSSlack;
+import org.apache.flink.streaming.api.operators.aion.WindowSSlackManager;
+import org.apache.flink.streaming.api.operators.aion.estimators.WindowSizeEstimator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import static org.apache.flink.streaming.api.operators.watslack.WindowSSlackManager.STATS_SIZE;
+import static org.apache.flink.streaming.api.operators.aion.WindowSSlackManager.STATS_SIZE;
 
 /**
  * This class determines sampling rates across for each substream.
@@ -66,10 +66,12 @@ public abstract class AbstractSSlackAlg {
             return;
         }
 
-        sizeEstimationErrorHisto.update(
-                (Math.abs(plan.getObservedEvents(localSSIndex) - windowSSlack.getObservedEvents(localSSIndex))));
-        srEstimationErrorHisto.update(
-                ((long) (1000 * Math.abs(plan.getSamplingRate(localSSIndex) - windowSSlack.getSamplingRate(localSSIndex)))));
+        if (windowSSlackManager.isWarmedUp()) {
+            sizeEstimationErrorHisto.update(
+                    (Math.abs(plan.getObservedEvents(localSSIndex) - windowSSlack.getObservedEvents(localSSIndex))));
+            srEstimationErrorHisto.update(
+                    ((long) (1000 * Math.abs(plan.getSamplingRate(localSSIndex) - windowSSlack.getSamplingRate(localSSIndex)))));
+        }
 
         /* Purge the SS part of the plan. */
         plan.purgeSS(localSSIndex);

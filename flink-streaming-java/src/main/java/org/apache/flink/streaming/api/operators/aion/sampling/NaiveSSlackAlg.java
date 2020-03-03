@@ -1,8 +1,8 @@
-package org.apache.flink.streaming.api.operators.watslack.sampling;
+package org.apache.flink.streaming.api.operators.aion.sampling;
 
-import org.apache.flink.streaming.api.operators.watslack.WindowSSlack;
-import org.apache.flink.streaming.api.operators.watslack.WindowSSlackManager;
-import org.apache.flink.streaming.api.operators.watslack.estimators.WindowSizeEstimator;
+import org.apache.flink.streaming.api.operators.aion.WindowSSlack;
+import org.apache.flink.streaming.api.operators.aion.WindowSSlackManager;
+import org.apache.flink.streaming.api.operators.aion.estimators.WindowSizeEstimator;
 
 public class NaiveSSlackAlg extends AbstractSSlackAlg {
 

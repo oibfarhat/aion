@@ -19,9 +19,8 @@ package org.apache.flink.streaming.api.operators;
 
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
-import org.apache.flink.streaming.api.operators.watslack.WindowSSlack;
-import org.apache.flink.streaming.api.operators.watslack.WindowSSlackManager;
-import org.apache.flink.streaming.api.operators.watslack.sampling.NaiveSSlackAlg;
+import org.apache.flink.streaming.api.operators.aion.WindowSSlack;
+import org.apache.flink.streaming.api.operators.aion.WindowSSlackManager;
 import org.apache.flink.streaming.api.watermark.Watermark;
 import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;
 import org.apache.flink.streaming.runtime.streamstatus.StreamStatus;
@@ -32,10 +31,7 @@ import org.apache.flink.util.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
 import java.util.concurrent.ScheduledFuture;
-
-import static org.apache.flink.streaming.api.watermark.Watermark.MAX_WATERMARK;
 
 /**
  * Source contexts for various stream time characteristics.
@@ -68,7 +64,7 @@ public class StreamSourceContexts {
 		final SourceFunction.SourceContext<OUT> ctx;
 		switch (timeCharacteristic) {
 			case EventTime:
-				ctx = new WatSlackWatermarkContext<>(
+				ctx = new AionWatermarkContext<>(
 						output,
 						processingTimeService,
 						new WindowSSlackManager(
@@ -293,17 +289,17 @@ public class StreamSourceContexts {
 	 * {@link SourceFunction.SourceContext} to be used for sources with adaptive delays for
 	 * watermark emission.
 	 */
-	private static class WatSlackWatermarkContext<T> extends WatermarkContext<T> {
+	private static class AionWatermarkContext<T> extends WatermarkContext<T> {
 
 		private final Output<StreamRecord<T>> output;
 		private final StreamRecord<T> reuse;
 
 		private final WindowSSlackManager windowSSlackManager;
 
-		private final static int MAX_TRIALS = 50;
+		private final static int MAX_TRIALS = 5;
 		private int trials = 0;
 
-		private WatSlackWatermarkContext(
+		private AionWatermarkContext(
 				final Output<StreamRecord<T>> output,
 				final ProcessingTimeService timeService,
 				final WindowSSlackManager windowSSlackManager,
@@ -334,7 +330,7 @@ public class StreamSourceContexts {
 				long watTarget = window.emitWatermark(timestamp);
 				if (watTarget != -1) {
 					Watermark watermark = new Watermark(watTarget);
-					output.emitWatermark(new Watermark(watTarget));
+					output.emitWatermark(watermark);
 					windowSSlackManager.setLastEmittedWatermark(watTarget);
 					LOG.info("Emitted WT = {}", watermark);
 				}

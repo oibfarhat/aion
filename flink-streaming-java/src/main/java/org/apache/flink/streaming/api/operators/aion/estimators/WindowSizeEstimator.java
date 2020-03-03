@@ -1,8 +1,9 @@
-package org.apache.flink.streaming.api.operators.watslack.estimators;
+package org.apache.flink.streaming.api.operators.aion.estimators;
 
-import org.apache.flink.streaming.api.operators.watslack.WindowSSlackManager;
-import org.apache.flink.streaming.api.operators.watslack.diststore.DistStoreManager;
-import org.apache.flink.streaming.api.operators.watslack.diststore.SSDistStore;
+import org.apache.flink.streaming.api.operators.aion.WindowSSlack;
+import org.apache.flink.streaming.api.operators.aion.WindowSSlackManager;
+import org.apache.flink.streaming.api.operators.aion.diststore.DistStoreManager;
+import org.apache.flink.streaming.api.operators.aion.diststore.SSDistStore;
 
 import java.util.Set;
 
@@ -36,6 +37,18 @@ public class WindowSizeEstimator {
         double averageNetDelay = purgedNetDelay.stream().mapToDouble(SSDistStore::getMean).average().getAsDouble();
         double averageGenDelay = purgedGenDelay.stream().mapToDouble(SSDistStore::getMean).average().getAsDouble();
 
-        return (long) Math.ceil(sSlackManager.getSSLength() * averageGenDelay);
+        return (long) Math.ceil(sSlackManager.getSSLength() / averageGenDelay);
+    }
+
+    public long getEventsNumPerSS(WindowSSlack sSlack, long t) {
+        Set<SSDistStore> purgedNetDelay = netDelayManager.getPurgedData();
+        Set<SSDistStore> purgedGenDelay = genDelayManager.getPurgedData();
+
+        assert purgedGenDelay.size() == purgedNetDelay.size();
+
+        double averageNetDelay = purgedNetDelay.stream().mapToDouble(SSDistStore::getMean).average().getAsDouble();
+        double averageGenDelay = purgedGenDelay.stream().mapToDouble(SSDistStore::getMean).average().getAsDouble();
+
+        return (long) Math.ceil(sSlackManager.getSSLength() / averageGenDelay);
     }
 }

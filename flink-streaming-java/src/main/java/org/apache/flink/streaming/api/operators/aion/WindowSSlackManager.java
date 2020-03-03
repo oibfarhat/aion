@@ -1,25 +1,22 @@
-package org.apache.flink.streaming.api.operators.watslack;
+package org.apache.flink.streaming.api.operators.aion;
 
 import org.apache.flink.metrics.Counter;
 import org.apache.flink.metrics.Histogram;
 import org.apache.flink.metrics.HistogramStatistics;
 import org.apache.flink.metrics.SimpleCounter;
 import org.apache.flink.runtime.metrics.DescriptiveStatisticsHistogram;
-import org.apache.flink.runtime.metrics.groups.UnregisteredMetricGroups;
-import org.apache.flink.streaming.api.operators.watslack.diststore.DistStoreManager;
-import org.apache.flink.streaming.api.operators.watslack.diststore.WindowDistStore;
-import org.apache.flink.streaming.api.operators.watslack.estimators.WindowSizeEstimator;
-import org.apache.flink.streaming.api.operators.watslack.sampling.AbstractSSlackAlg;
-import org.apache.flink.streaming.api.operators.watslack.sampling.NaiveSSlackAlg;
+import org.apache.flink.streaming.api.operators.aion.diststore.DistStoreManager;
+import org.apache.flink.streaming.api.operators.aion.estimators.WindowSizeEstimator;
+import org.apache.flink.streaming.api.operators.aion.sampling.AbstractSSlackAlg;
+import org.apache.flink.streaming.api.operators.aion.sampling.NaiveSSlackAlg;
 import org.apache.flink.streaming.runtime.tasks.ProcessingTimeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static org.apache.flink.streaming.api.operators.watslack.diststore.DistStoreManager.DistStoreType.GEN_DELAY;
-import static org.apache.flink.streaming.api.operators.watslack.diststore.DistStoreManager.DistStoreType.NET_DELAY;
+import static org.apache.flink.streaming.api.operators.aion.diststore.DistStoreManager.DistStoreType.GEN_DELAY;
+import static org.apache.flink.streaming.api.operators.aion.diststore.DistStoreManager.DistStoreType.NET_DELAY;
 
 
 /**
@@ -30,8 +27,8 @@ public final class WindowSSlackManager {
 
     protected static final Logger LOG = LoggerFactory.getLogger(WindowSSlackManager.class);
 
-    static final int MAX_NET_DELAY = 1000; // We can tolerate up to 500ms max delay.
-    private static final int HISTORY_SIZE = 1024;
+    static final int MAX_NET_DELAY = 500; // We can tolerate up to 500ms max delay.
+    private static final int HISTORY_SIZE = 20;
     public static final int STATS_SIZE = 10000;
 
     private final ProcessingTimeService processingTimeService;
@@ -49,7 +46,8 @@ public final class WindowSSlackManager {
     private final Map<Long, WindowSSlack> windowSlacksMap;
     /* Metrics */
     private final Counter windowsCounter;
-
+    private final PriorityQueue<Long> watEmissionTimes;
+    private boolean isPrintingStats;
     /* Stats purger */
     private final Thread timestampsPurger;
     private boolean isWarmedUp;
@@ -80,10 +78,12 @@ public final class WindowSSlackManager {
         this.timestampsPurger.start();
         /* Metrics */
         this.windowsCounter = new SimpleCounter();
+        this.watEmissionTimes = new PriorityQueue<>();
+        this.isPrintingStats = false;
     }
 
     /* Getters & Setters */
-    public long getWindowLength() {
+    long getWindowLength() {
         return windowLength;
     }
 
@@ -115,7 +115,7 @@ public final class WindowSSlackManager {
         return windowSlacksMap.getOrDefault(windowIndex, null);
     }
 
-    public AbstractSSlackAlg getsSlackAlg() {
+    AbstractSSlackAlg getsSlackAlg() {
         return sSlackAlg;
     }
 
@@ -126,7 +126,6 @@ public final class WindowSSlackManager {
     DistStoreManager getInterEventStoreManager() {
         return interEventStoreManager;
     }
-
     /* Map manipulation */
     public WindowSSlack getWindowSlack(long eventTime) {
         long windowIndex = getWindowIndex(eventTime);
@@ -152,7 +151,6 @@ public final class WindowSSlackManager {
             // remove
         }
     }
-
     /* Index & Deadlines calculation */
     final long getWindowIndex(long eventTime) {
         return (long) Math.floor(eventTime / (windowLength * 1.0));
@@ -166,7 +164,15 @@ public final class WindowSSlackManager {
         return windowIndex * windowLength + (ssIndex + 1) * ssLength;
     }
 
+    void recordWatermark(long watermark) {
+        watEmissionTimes.add(watermark);
+    }
+
     public void printStats() {
+        if (this.isPrintingStats)
+            return;
+
+        this.isPrintingStats = true;
         StringBuilder sb = new StringBuilder();
         // This is gonna be a length function.
         sb.append("Number of Windows observed:\t").append(windowsCounter.getCount()).append("\n");
@@ -194,6 +200,16 @@ public final class WindowSSlackManager {
         // Algorithm
         HistogramStatistics algSizeError = getsSlackAlg().getSizeEstimationStatistics();
         HistogramStatistics algSRError = getsSlackAlg().getSREstimationStatistics();
+        Histogram histogram = new DescriptiveStatisticsHistogram(STATS_SIZE);
+        if (!watEmissionTimes.isEmpty()) {
+            long timestamp = watEmissionTimes.poll();
+            while (!watEmissionTimes.isEmpty()) {
+                histogram.update(watEmissionTimes.peek() - timestamp);
+                timestamp = watEmissionTimes.poll();
+            }
+        }
+        HistogramStatistics algWatFreq = histogram.getStatistics();
+
         sb.append("Algorithm Stats:\n");
         sb.append("Size Error Estimation:\t")
                 .append(algSizeError.size()).append("\t")
@@ -203,6 +219,10 @@ public final class WindowSSlackManager {
                 .append(algSRError.size()).append("\t")
                 .append(algSRError.getMean()).append("\t")
                 .append(algSRError.getStdDev()).append("\n");
+        sb.append("Watermark Frequency:\t")
+                .append(algWatFreq.size()).append("\t")
+                .append(algWatFreq.getMean()).append("\t")
+                .append(algWatFreq.getStdDev()).append("\n");
         sb.append("===\n");
         // Network & Inter-Event Gen Delays
         HistogramStatistics netDelay = netDelayStoreManager.getMeanDelay();
@@ -219,14 +239,15 @@ public final class WindowSSlackManager {
         sb.append("===\n");
         System.out.println(sb.toString());
     }
-
     /* Purging Runnable that purges substreams stats */
     private class SSStatsPurger implements Runnable {
 
         private long currTime;
+        private long ssUntilPurges;
 
         SSStatsPurger(long currTime) {
             this.currTime = currTime;
+            this.ssUntilPurges = HISTORY_SIZE;
         }
 
         @Override
@@ -239,11 +260,14 @@ public final class WindowSSlackManager {
                 for (long currIndex = windowIndex - 15; currIndex <= windowIndex; currIndex++) {
                     WindowSSlack ws = windowSlacksMap.getOrDefault(windowIndex, null);
                     if (ws != null) {
-                        if (ws.purgeSS(currTime) && !isWarmedUp) {
-                            // We have enough data now!
-                            LOG.info("It is finally warmed up at t = {}", currTime);
-                            isWarmedUp = true;
+                        boolean purge = ws.purgeSS(currTime);
+                        if (purge && !isWarmedUp) {
+                            if (--this.ssUntilPurges == 0) {
+                                LOG.info("It is finally warmed up at t = {}", currTime);
+                                isWarmedUp = true;
+                            }
                         }
+
                     }
                 }
 

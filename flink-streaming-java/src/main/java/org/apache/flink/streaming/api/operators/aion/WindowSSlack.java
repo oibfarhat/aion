@@ -1,13 +1,13 @@
-package org.apache.flink.streaming.api.operators.watslack;
+package org.apache.flink.streaming.api.operators.aion;
 
 import org.apache.flink.metrics.Histogram;
 import org.apache.flink.runtime.metrics.DescriptiveStatisticsHistogram;
-import org.apache.flink.streaming.api.operators.watslack.diststore.WindowDistStore;
+import org.apache.flink.streaming.api.operators.aion.diststore.WindowDistStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.apache.flink.streaming.api.operators.watslack.WindowSSlackManager.MAX_NET_DELAY;
-import static org.apache.flink.streaming.api.operators.watslack.WindowSSlackManager.STATS_SIZE;
+import static org.apache.flink.streaming.api.operators.aion.WindowSSlackManager.MAX_NET_DELAY;
+import static org.apache.flink.streaming.api.operators.aion.WindowSSlackManager.STATS_SIZE;
 
 public class WindowSSlack {
 
@@ -86,7 +86,11 @@ public class WindowSSlack {
      */
     public long emitWatermark(long eventTime) {
         int localSSIndex = getSSLocalIndex(eventTime);
-        return sSlackManager.getsSlackAlg().emitWatermark(this, localSSIndex, getObservedEvents(localSSIndex));
+        long watTime = sSlackManager.getsSlackAlg().emitWatermark(this, localSSIndex, getObservedEvents(localSSIndex));
+        if (watTime != -1) {
+            sSlackManager.recordWatermark(watTime);
+        }
+        return watTime;
     }
 
     boolean purgeSS(long maxPurgeTime) {
@@ -111,8 +115,10 @@ public class WindowSSlack {
                         windowIndex, localSSIndex, getSampledEvents(localSSIndex), shedEvents[localSSIndex],
                         observedEvents, samplingRatio);
 
-                eventsPerSSHisto.update(observedEvents);
-                samplingRatePerSSHisto.update((long) (samplingRatio * 1000));
+                if (sSlackManager.isWarmedUp()) {
+                    eventsPerSSHisto.update(observedEvents);
+                    samplingRatePerSSHisto.update((long) (samplingRatio * 1000));
+                }
             }
             succPurged |= newlyPurged;
         }

@@ -1,7 +1,7 @@
-package org.apache.flink.streaming.api.operators.watslack.sampling;
+package org.apache.flink.streaming.api.operators.aion.sampling;
 
 
-import org.apache.flink.streaming.api.operators.watslack.WindowSSlack;
+import org.apache.flink.streaming.api.operators.aion.WindowSSlack;
 
 class SamplingPlan {
     private final WindowSSlack windowSSlack;
