@@ -82,7 +82,7 @@ public abstract class AbstractSSlackAlg {
         updatePlan(windowSSlack);
     }
 
-    public boolean sample(WindowSSlack windowSSlack, int localSSIndex) {
+    public boolean sample(WindowSSlack windowSSlack, int localSSIndex, long eventTime) {
         // Avoid sampling when warm-up is not done!
         if (!windowSSlackManager.isWarmedUp()) {
             return true;
@@ -98,21 +98,28 @@ public abstract class AbstractSSlackAlg {
         return random.nextDouble() <= samplingPlanMap.get(windowSSlack).getSamplingRate(localSSIndex);
     }
 
-    public long emitWatermark(WindowSSlack windowSSlack, int localSSIndex, long observedEvents) {
+    public final long emitWatermark() {
         // Avoid sampling when warm-up is not done!
         if (!windowSSlackManager.isWarmedUp()) {
             return -1;
         }
-        long watermarkTarget = windowSSlackManager.getSSDeadline(windowSSlack.getWindowIndex(), localSSIndex);
-        // Watermark already emitted
-        if (windowSSlackManager.getLastEmittedWatermark() >= watermarkTarget) {
-            return -1;
+
+        long lastWatermark = windowSSlackManager.getLastEmittedWatermark();
+        WindowSSlack currWindow = windowSSlackManager.getWindowSlack(lastWatermark);
+        for(int localSSIndex = currWindow.getSSLocalIndex(lastWatermark);
+            localSSIndex < windowSSlackManager.getSSSize();
+            localSSIndex++) {
+            long watermarkTarget = windowSSlackManager.getSSDeadline(currWindow.getWindowIndex(), localSSIndex);
+            // We found the unprocessed sub-stream
+            if (lastWatermark < watermarkTarget) {
+                if (satisfySubstreamTarget(currWindow, localSSIndex)) {
+                    return watermarkTarget;
+                } else {
+                    return -1;
+                }
+            }
         }
-        SamplingPlan plan = samplingPlanMap.getOrDefault(windowSSlack, null);
-        if (plan.getObservedEvents(localSSIndex) <= observedEvents) {
-            return watermarkTarget;
-        }
-        return -1;
+       return -1;
     }
 
     public HistogramStatistics getSizeEstimationStatistics() {
@@ -128,4 +135,5 @@ public abstract class AbstractSSlackAlg {
 
     protected abstract void updatePlan(WindowSSlack windowSSlack);
 
+    protected abstract boolean satisfySubstreamTarget(WindowSSlack windowSSlack, int localSSIndex);
 }

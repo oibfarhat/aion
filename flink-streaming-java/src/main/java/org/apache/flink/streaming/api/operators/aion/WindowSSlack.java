@@ -48,7 +48,7 @@ public class WindowSSlack {
     /*
      * Internal function that @returns local substream index in relation to window.
      */
-    private int getSSLocalIndex(long eventTime) {
+    public int getSSLocalIndex(long eventTime) {
         assert sSlackManager.getWindowIndex(eventTime) == windowIndex;
         return (int) ((eventTime - (windowIndex * sSlackManager.getWindowLength())) / sSlackManager.getSSLength());
     }
@@ -71,7 +71,7 @@ public class WindowSSlack {
         genDelayStore.addEvent(localSSIndex, eventTime);
 
         /* Consider the algorithm's wise opinion. */
-        if (sSlackManager.getsSlackAlg().sample(this, localSSIndex)) {
+        if (sSlackManager.getsSlackAlg().sample(this, localSSIndex, eventTime)) {
             sampledEvents[localSSIndex]++;
             return true;
         }
@@ -84,9 +84,8 @@ public class WindowSSlack {
      *
      * @returns a boolean value that determines if the tuple to be included in the sample.
      */
-    public long emitWatermark(long eventTime) {
-        int localSSIndex = getSSLocalIndex(eventTime);
-        long watTime = sSlackManager.getsSlackAlg().emitWatermark(this, localSSIndex, getObservedEvents(localSSIndex));
+    public long emitWatermark() {
+        long watTime = sSlackManager.getsSlackAlg().emitWatermark();
         if (watTime != -1) {
             sSlackManager.recordWatermark(watTime);
         }

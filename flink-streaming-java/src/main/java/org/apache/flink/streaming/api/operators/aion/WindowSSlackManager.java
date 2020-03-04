@@ -8,6 +8,7 @@ import org.apache.flink.runtime.metrics.DescriptiveStatisticsHistogram;
 import org.apache.flink.streaming.api.operators.aion.diststore.DistStoreManager;
 import org.apache.flink.streaming.api.operators.aion.estimators.WindowSizeEstimator;
 import org.apache.flink.streaming.api.operators.aion.sampling.AbstractSSlackAlg;
+import org.apache.flink.streaming.api.operators.aion.sampling.KSlackNoSampling;
 import org.apache.flink.streaming.api.operators.aion.sampling.NaiveSSlackAlg;
 import org.apache.flink.streaming.runtime.tasks.ProcessingTimeService;
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ public final class WindowSSlackManager {
     protected static final Logger LOG = LoggerFactory.getLogger(WindowSSlackManager.class);
 
     static final int MAX_NET_DELAY = 500; // We can tolerate up to 500ms max delay.
-    private static final int HISTORY_SIZE = 20;
+    private static final int HISTORY_SIZE = 1024;
     public static final int STATS_SIZE = 10000;
 
     private final ProcessingTimeService processingTimeService;
@@ -47,6 +48,7 @@ public final class WindowSSlackManager {
     /* Metrics */
     private final Counter windowsCounter;
     private final PriorityQueue<Long> watEmissionTimes;
+    private final Histogram watDelays;
     private boolean isPrintingStats;
     /* Stats purger */
     private final Thread timestampsPurger;
@@ -68,7 +70,7 @@ public final class WindowSSlackManager {
 
         WindowSizeEstimator srEstimator =
                 new WindowSizeEstimator(this, netDelayStoreManager, interEventStoreManager);
-        this.sSlackAlg = new NaiveSSlackAlg(this, srEstimator);
+        this.sSlackAlg = new KSlackNoSampling(this, srEstimator);
 
         this.windowSlacksMap = new HashMap<>();
 
@@ -79,6 +81,7 @@ public final class WindowSSlackManager {
         /* Metrics */
         this.windowsCounter = new SimpleCounter();
         this.watEmissionTimes = new PriorityQueue<>();
+        this.watDelays = new DescriptiveStatisticsHistogram(STATS_SIZE);
         this.isPrintingStats = false;
     }
 
@@ -165,6 +168,7 @@ public final class WindowSSlackManager {
     }
 
     void recordWatermark(long watermark) {
+        watDelays.update(System.currentTimeMillis() - watermark);
         watEmissionTimes.add(watermark);
     }
 
@@ -196,6 +200,9 @@ public final class WindowSSlackManager {
                     .append(sr.getStdDev()).append("\n");
             sb.append("===\n");
         }
+        System.out.println(sb.toString());
+
+        sb = new StringBuilder();
 
         // Algorithm
         HistogramStatistics algSizeError = getsSlackAlg().getSizeEstimationStatistics();
@@ -209,7 +216,7 @@ public final class WindowSSlackManager {
             }
         }
         HistogramStatistics algWatFreq = histogram.getStatistics();
-
+        HistogramStatistics algDelays = watDelays.getStatistics();
         sb.append("Algorithm Stats:\n");
         sb.append("Size Error Estimation:\t")
                 .append(algSizeError.size()).append("\t")
@@ -223,6 +230,10 @@ public final class WindowSSlackManager {
                 .append(algWatFreq.size()).append("\t")
                 .append(algWatFreq.getMean()).append("\t")
                 .append(algWatFreq.getStdDev()).append("\n");
+        sb.append("Watermark Delays:\t")
+                .append(algDelays.size()).append("\t")
+                .append(algDelays.getMean()).append("\t")
+                .append(algDelays.getStdDev()).append("\n");
         sb.append("===\n");
         // Network & Inter-Event Gen Delays
         HistogramStatistics netDelay = netDelayStoreManager.getMeanDelay();

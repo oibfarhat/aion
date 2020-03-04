@@ -296,7 +296,7 @@ public class StreamSourceContexts {
 
 		private final WindowSSlackManager windowSSlackManager;
 
-		private final static int MAX_TRIALS = 5;
+		private final static int MAX_TRIALS = 1;
 		private int trials = 0;
 
 		private AionWatermarkContext(
@@ -327,7 +327,7 @@ public class StreamSourceContexts {
 
 			trials++;
 			if (trials == MAX_TRIALS) {
-				long watTarget = window.emitWatermark(timestamp);
+				long watTarget = window.emitWatermark();
 				if (watTarget != -1) {
 					Watermark watermark = new Watermark(watTarget);
 					output.emitWatermark(watermark);
